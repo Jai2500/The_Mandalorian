@@ -1,2 +1,3 @@
 #Don't track the contents of this folder
 venv/
+.vscode/
