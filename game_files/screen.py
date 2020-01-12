@@ -1,7 +1,10 @@
-import colorama as cl
+'''
+    Importing all the required modules
+'''
 import os
-import numpy as np
 import time
+import colorama as cl
+import numpy as np
 
 cl.init()
 BG_BLUE = cl.Back.BLUE
@@ -18,30 +21,41 @@ class Screen:
     '''
 
     def __init__(self):
-        '''Initializes the screen object with the basic parameters'''
+        '''
+            Initializes the screen object with the basic parameters
+        '''
         self.__screen_dim = \
             np.array(os.popen('stty size', 'r').read().split(), dtype='int')
-        self.final_arr = np.array([[' ' for i in range(self.__screen_dim[1])] 
-                                  for j in range(self.__screen_dim[0])],
+        self.final_arr = np.array([[' ' for i in range(self.__screen_dim[1])]
+                                   for j in range(self.__screen_dim[0])],
                                   dtype='<U100')
-        self.ground_height = self.__screen_dim[0] - 5
+        self.ground_height = self.__screen_dim[0] - \
+            int(self.__screen_dim[0] * 0.25)
 
     def get_dim(self):
+        '''
+            Returns the height and width of the screen. Used as a wrapper
+        '''
         return self.__screen_dim
 
     def draw(self):
+        '''
+            Draw the final image onto the screen
+        '''
         print('\033[0;0H' + BG_BLUE, end='')
-        self.final_arr[self.ground_height][0] = BG_GREEN + self.final_arr[self.ground_height][0]
+        self.final_arr[self.ground_height][0] = BG_GREEN + \
+            self.final_arr[self.ground_height][0]
         final_img = ''.join(self.final_arr.ravel())
         print(final_img)
 
 
-a = Screen()
-print(a.get_dim())
+TERM_SCREEN = Screen()
+print(TERM_SCREEN.get_dim())
 print("\033[0;0H")
+os.system('clear')
 while True:
     time.sleep(0.033)
-    a.draw()
+    TERM_SCREEN.draw()
 
 
 # How will this work?
