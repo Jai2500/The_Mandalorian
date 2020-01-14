@@ -56,19 +56,17 @@ class Screen:
             pos_x = int(np.round(pawns[i].position[1]))
             pos_y = int(np.round(pawns[i].position[0]))
 
-            # print(pos_x, pos_y)
             pawns[i].check_collision(~np.isin(self.obj_arr[
-                                    pos_y: pos_y + pawns[i].sprite.shape[0],
-                                    pos_x: pos_x + pawns[i].sprite.shape[1]
-                                    ], [i+1, 0]))
+                pos_y: pos_y + pawns[i].sprite.shape[0],
+                pos_x: pos_x + pawns[i].sprite.shape[1]
+                ], [i+1, 0]))
 
             pos_x = int(np.round(pawns[i].position[1]))
             pos_y = int(np.round(pawns[i].position[0]))
 
-            # print(pos_x, pos_y)
-
             self.final_arr[pos_y: pos_y + pawns[i].sprite.shape[0],
-                           pos_x: pos_x + pawns[i].sprite.shape[1]] = pawns[i].sprite
+                           pos_x: pos_x + pawns[i].sprite.shape[1]
+                           ] = pawns[i].sprite
 
             self.obj_arr[pos_y: pos_y + pawns[i].sprite.shape[0],
                          pos_x: pos_x + pawns[i].sprite.shape[1]] \
@@ -85,27 +83,36 @@ class Screen:
         print(final_img)
 
 
+TERM_SCREEN = Screen()
+screen_dim = TERM_SCREEN.get_dim()
+
 TEST_GAMERULE = Gamerule(0.3, 0.4)
 TEST_SHAPE = np.array([[' ', 'o', ' '],
                        ['/', '|', ' '],
                        ['|', '|', ' ']])
 
 TEST_SHAPE_2 = np.array([[' ', '*', ' '],
-                       [' ', 'o', '\\'],
-                       [' ', '|', '|']])
+                         [' ', 'o', '\\'],
+                         [' ', '|', '|']])
 
 test_obj_shape = np.array([[' ', '-', '-'],
                           ['-', '-', '-']])
 
-test_obj = Pawn(test_obj_shape, [17, ], 0)
+
+GROUND_SHAPE = np.array([['-' for i in range(screen_dim[1])]
+                        for j in range(int(screen_dim[0] * 0.1))],
+                        dtype='<U100')
+
+GROUND_OBJ = Pawn(GROUND_SHAPE, [screen_dim[0] - int(screen_dim[0] * 0.1), 0],
+                  0)
+
+test_obj = Pawn(test_obj_shape, [17, 10], 0)
 
 TEST_PAWN = Actor(TEST_SHAPE, [4, 4], 0.3)
-TEST_PAWN_2 = Actor(TEST_SHAPE_2, [10, 6], 0.3)
-PAWN_ARRAY = np.array([test_obj, TEST_PAWN_2, TEST_PAWN])
+TEST_PAWN_2 = Actor(TEST_SHAPE_2, [4, 4], 0.3)
+PAWN_ARRAY = np.array([GROUND_OBJ, TEST_PAWN_2, TEST_PAWN])
 
 
-TERM_SCREEN = Screen()
-print(TERM_SCREEN.get_dim())
 print("\033[0;0H")
 os.system('clear')
 while True:

@@ -31,8 +31,9 @@ class Actor(Pawn):
         overlap_box = self.collision_box * out_arr
         # print(overlap_box, self.sprite[0])
 
-        # Make changes to that
-        
+        # Version 1.2 based on the Z-index
+        # Possible issues: -- Way to compare the Z-index
+
         if np.sum(overlap_box) > 0:
             mpv = np.array([0, 0])
             if self.velocity[0] > 0.0:
@@ -66,12 +67,6 @@ class Actor(Pawn):
 
             self.position = self.position + mpv
             self.velocity = self.velocity * (mpv == 0)
-            # print(mpv)
+            return True
 
-
-# class Character(Actor):
-#     def on_collision(self, other): 
-
-TEST_SHAPE = np.array([[' ', 'o', ' '],
-                       [' /', '|', '\\'],
-                       ['|', '|', '|']])
+        return False
