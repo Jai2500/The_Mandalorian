@@ -5,7 +5,7 @@ import os
 import time
 import colorama as cl
 import numpy as np
-from pawn import Actor
+from pawn import Actor, Pawn
 from gamerule import Gamerule
 
 cl.init()
@@ -52,16 +52,27 @@ class Screen:
                                 dtype=np.int32)
 
     def add_pawn(self, pawns):
-        i = 1
-        for pawn in pawns:
-            pos_x = int(np.round(pawn.position[1]))
-            pos_y = int(np.round(pawn.position[0]))
-            self.final_arr[pos_y: pos_y + pawn.sprite.shape[0],
-                           pos_x: pos_x + pawn.sprite.shape[1]] = pawn.sprite
-            self.obj_arr[pos_y: pos_y + pawn.sprite.shape[0],
-                         pos_x: pos_x + pawn.sprite.shape[1]] \
-                = np.ones(pawn.sprite.shape) * i
-            i += 1
+        for i in range(len(pawns)):
+            pos_x = int(np.round(pawns[i].position[1]))
+            pos_y = int(np.round(pawns[i].position[0]))
+
+            # print(pos_x, pos_y)
+            pawns[i].check_collision(~np.isin(self.obj_arr[
+                                    pos_y: pos_y + pawns[i].sprite.shape[0],
+                                    pos_x: pos_x + pawns[i].sprite.shape[1]
+                                    ], [i+1, 0]))
+
+            pos_x = int(np.round(pawns[i].position[1]))
+            pos_y = int(np.round(pawns[i].position[0]))
+
+            # print(pos_x, pos_y)
+
+            self.final_arr[pos_y: pos_y + pawns[i].sprite.shape[0],
+                           pos_x: pos_x + pawns[i].sprite.shape[1]] = pawns[i].sprite
+
+            self.obj_arr[pos_y: pos_y + pawns[i].sprite.shape[0],
+                         pos_x: pos_x + pawns[i].sprite.shape[1]] \
+                = pawns[i].collision_box * (i + 1)
 
     def draw(self):
         '''
@@ -79,34 +90,31 @@ TEST_SHAPE = np.array([[' ', 'o', ' '],
                        ['/', '|', ' '],
                        ['|', '|', ' ']])
 
-TEST_SHAPE_2 = np.array([[' ', 'o', ' '],
+TEST_SHAPE_2 = np.array([[' ', '*', ' '],
                        [' ', 'o', '\\'],
                        [' ', '|', '|']])
 
+test_obj_shape = np.array([[' ', '-', '-'],
+                          ['-', '-', '-']])
 
-TEST_PAWN = Actor(TEST_SHAPE, [4, 4], 0.5)
-TEST_PAWN_2 = Actor(TEST_SHAPE_2, [10, 5], 0.02)
-PAWN_ARRAY = np.array([TEST_PAWN, TEST_PAWN_2])
+test_obj = Pawn(test_obj_shape, [17, ], 0)
+
+TEST_PAWN = Actor(TEST_SHAPE, [4, 4], 0.3)
+TEST_PAWN_2 = Actor(TEST_SHAPE_2, [10, 6], 0.3)
+PAWN_ARRAY = np.array([test_obj, TEST_PAWN_2, TEST_PAWN])
+
 
 TERM_SCREEN = Screen()
 print(TERM_SCREEN.get_dim())
 print("\033[0;0H")
 os.system('clear')
 while True:
-    time.sleep(0.13)
+    time.sleep(0.033)
+    TERM_SCREEN.reset_screen()
     for i in range(len(PAWN_ARRAY)):
         PAWN_ARRAY[i] = TEST_GAMERULE.simulate_physics(PAWN_ARRAY[i])
-    TERM_SCREEN.reset_screen()
     TERM_SCREEN.add_pawn(PAWN_ARRAY)
-    for i in range(len(PAWN_ARRAY)):
-        pos_x = int(np.round(PAWN_ARRAY[i].position[1]))
-        pos_y = int(np.round(PAWN_ARRAY[i].position[0]))
-        PAWN_ARRAY[i].check_collision(TERM_SCREEN.obj_arr[
-                                pos_y: pos_y + PAWN_ARRAY[i].sprite.shape[0],
-                                pos_x: pos_x + PAWN_ARRAY[i].sprite.shape[1]
-                                ] - (i + 1))
-    TERM_SCREEN.reset_screen()
-    TERM_SCREEN.add_pawn(PAWN_ARRAY)
+
     TERM_SCREEN.draw()
 
 

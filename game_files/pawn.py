@@ -14,6 +14,9 @@ class Pawn:
         collision_box = obj_shape != ' '
         return collision_box
 
+    def check_collision(self, out_arr):
+        pass
+
     def on_collision(self):
         print("The object has collided")
 
@@ -26,8 +29,10 @@ class Actor(Pawn):
     def check_collision(self, out_arr):
 
         overlap_box = self.collision_box * out_arr
-        # print(overlap_box)
+        # print(overlap_box, self.sprite[0])
 
+        # Make changes to that
+        
         if np.sum(overlap_box) > 0:
             mpv = np.array([0, 0])
             if self.velocity[0] > 0.0:
@@ -53,8 +58,15 @@ class Actor(Pawn):
                 if non_zero.size > 0:
                     mpv[1] = self.sprite.shape[1] - np.min(non_zero)
 
+        # if np.sum(overlap_box) > 0:
+        #     mpv = np.array([0,0])
+        #     if self.velocity[0] != 0:
+        #         row_sums = np.sum(overlap_box, axis = 1)
+        #         non_zero = np.nonzero(row_sums)[0]
+
             self.position = self.position + mpv
             self.velocity = self.velocity * (mpv == 0)
+            # print(mpv)
 
 
 # class Character(Actor):
