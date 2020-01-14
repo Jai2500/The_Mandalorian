@@ -11,6 +11,6 @@ class Gamerule:
         self.drag_coeff = drag_coeff
 
     def simulate_physics(self, pawn):
-        pawn.velocity[0] += pawn.mass * self.gravity
         pawn.position[0] += pawn.velocity[0]
+        pawn.velocity[0] += pawn.mass * self.gravity
         return pawn

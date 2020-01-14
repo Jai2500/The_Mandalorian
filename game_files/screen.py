@@ -7,6 +7,7 @@ import colorama as cl
 import numpy as np
 from pawn import Actor, Pawn
 from gamerule import Gamerule
+from obstacles import Firebeam
 
 cl.init()
 BG_BLUE = cl.Back.BLUE
@@ -48,29 +49,41 @@ class Screen:
                                   dtype='<U100')
         self.final_arr[self.ground_height][0] = BG_GREEN + \
             self.final_arr[self.ground_height][0]
-        self.obj_arr = np.zeros((self.__screen_dim[0], self.__screen_dim[1]),
-                                dtype=np.int32)
+        self.obj_arr = np.ones((self.__screen_dim[0], self.__screen_dim[1]),
+                                dtype=np.int32) * -1
 
     def add_pawn(self, pawns):
+        to_delete = []
         for i in range(len(pawns)):
             pos_x = int(np.round(pawns[i].position[1]))
             pos_y = int(np.round(pawns[i].position[0]))
 
-            pawns[i].check_collision(~np.isin(self.obj_arr[
+            obj_array = self.obj_arr[
                 pos_y: pos_y + pawns[i].sprite.shape[0],
-                pos_x: pos_x + pawns[i].sprite.shape[1]
-                ], [i+1, 0]))
+                pos_x: pos_x + pawns[i].sprite.shape[1],
+                ]
 
-            pos_x = int(np.round(pawns[i].position[1]))
-            pos_y = int(np.round(pawns[i].position[0]))
+            collision = pawns[i].check_collision(~np.isin(obj_array, [i, -1]))
 
-            self.final_arr[pos_y: pos_y + pawns[i].sprite.shape[0],
-                           pos_x: pos_x + pawns[i].sprite.shape[1]
-                           ] = pawns[i].sprite
+            if collision is True:
+                objs = np.unique(obj_array)
+                for j in objs:
+                    pawns[j].on_collision(pawns[i])
 
-            self.obj_arr[pos_y: pos_y + pawns[i].sprite.shape[0],
-                         pos_x: pos_x + pawns[i].sprite.shape[1]] \
-                = pawns[i].collision_box * (i + 1)
+            if pawns[i].to_delete is False:
+                self.obj_arr[pos_y: pos_y + pawns[i].sprite.shape[0],
+                             pos_x: pos_x + pawns[i].sprite.shape[1]] \
+                    = pawns[i].collision_box * i
+
+                pos_x = int(np.round(pawns[i].position[1]))
+                pos_y = int(np.round(pawns[i].position[0]))
+
+                self.final_arr[pos_y: pos_y + pawns[i].sprite.shape[0],
+                               pos_x: pos_x + pawns[i].sprite.shape[1]
+                               ] = pawns[i].sprite
+            else:
+                to_delete.append(i)
+        return np.array(to_delete, dtype=np.int)
 
     def draw(self):
         '''
@@ -85,6 +98,7 @@ class Screen:
 
 TERM_SCREEN = Screen()
 screen_dim = TERM_SCREEN.get_dim()
+
 
 TEST_GAMERULE = Gamerule(0.3, 0.4)
 TEST_SHAPE = np.array([[' ', 'o', ' '],
@@ -106,24 +120,26 @@ GROUND_SHAPE = np.array([['-' for i in range(screen_dim[1])]
 GROUND_OBJ = Pawn(GROUND_SHAPE, [screen_dim[0] - int(screen_dim[0] * 0.1), 0],
                   0)
 
-test_obj = Pawn(test_obj_shape, [17, 10], 0)
+test_obj = Pawn(test_obj_shape, [13, 10], 0)
 
-TEST_PAWN = Actor(TEST_SHAPE, [4, 4], 0.3)
-TEST_PAWN_2 = Actor(TEST_SHAPE_2, [4, 4], 0.3)
-PAWN_ARRAY = np.array([GROUND_OBJ, TEST_PAWN_2, TEST_PAWN])
+TEST_PAWN = Actor(TEST_SHAPE, [4, 4], 0.3, is_player=True)
+TEST_PAWN_2 = Actor(TEST_SHAPE_2, [4, 4], 0.3, is_player=True)
+test_firebeam = Firebeam([17, 4])
+PAWN_ARRAY = np.array([GROUND_OBJ, test_firebeam, TEST_PAWN, TEST_PAWN_2])
 
+print(test_firebeam.type, test_firebeam.size)
 
-print("\033[0;0H")
-os.system('clear')
 while True:
-    time.sleep(0.033)
+    time.sleep(0.1)
     TERM_SCREEN.reset_screen()
     for i in range(len(PAWN_ARRAY)):
         PAWN_ARRAY[i] = TEST_GAMERULE.simulate_physics(PAWN_ARRAY[i])
-    TERM_SCREEN.add_pawn(PAWN_ARRAY)
-
+    to_delete = TERM_SCREEN.add_pawn(PAWN_ARRAY)
+    PAWN_ARRAY = np.delete(PAWN_ARRAY, to_delete)
+    # print(to_delete, "To delete")
     TERM_SCREEN.draw()
 
-
+# The position and the velocity keeps on increasing despite the ground
 # How will this work?
 # A fore and back cycle that first prints the fore and then the back ?
+# Make a dictionary that refers object number to the object

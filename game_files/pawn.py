@@ -2,26 +2,41 @@ import numpy as np
 
 
 class Pawn:
-    def __init__(self, sprite, position, mass=0):
+    def __init__(self, sprite, position, mass=0, is_player=False, lives=1):
         self.mass = mass
         self.sprite = sprite
         self.velocity = np.array([0, 0], dtype=np.float64)
         self.collision_box = self.create_collision_box(sprite)
         self.position = np.array(position, dtype=np.float64)
-        print(self.sprite.shape)
+        self.is_player = is_player
+        self.to_delete = False
+        self.lives = lives
+        # print(self.sprite.shape)
 
     def create_collision_box(self, obj_shape):
         collision_box = obj_shape != ' '
         return collision_box
 
     def check_collision(self, out_arr):
+        overlap_box = self.collision_box * out_arr
+        if np.sum(overlap_box) > 0:
+            return True
+        else:
+            return False
+
+    def on_trigger(self, other):
         pass
 
-    def on_collision(self):
-        print("The object has collided")
+    def on_collision(self, other):
+        return "The object has collided"
 
     def get_sprite(self):
         return self.sprite, self.collision_box
+
+    def die(self):
+        self.lives -= 1
+        if self.lives <= 0:
+            self.to_delete = True
 
 
 class Actor(Pawn):
@@ -70,3 +85,10 @@ class Actor(Pawn):
             return True
 
         return False
+
+
+# Refactor code -->
+# Pawn is all the things that exist on the board
+# Actor similar to things that can move and can stop on collision
+# Maybe add a player class after this
+# Each of the obstacles will be individual classes
