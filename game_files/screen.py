@@ -5,7 +5,7 @@ import os
 import time
 import colorama as cl
 import numpy as np
-from pawn import Actor, Pawn, Bullet
+from pawn import Actor, Pawn, Bullet, Coin
 from gamerule import Gamerule
 from obstacles import Firebeam
 
@@ -35,7 +35,8 @@ class Screen:
         self.ground_height = self.__screen_dim[0] - \
             int(self.__screen_dim[0] * 0.10)
         self.obj_arr = np.zeros((self.__screen_dim[0], self.__screen_dim[1]),
-                                dtype=np.int32) 
+                                dtype=np.int32)
+        self.game_score = 0
 
     def get_dim(self):
         '''
@@ -65,7 +66,7 @@ class Screen:
 
             PAWN_DICT[pawns[i].obj_number] = i
 
-            collision = pawns[i].check_collision(~np.isin(obj_array, [pawns[i].obj_number, 0]))
+            collision, position, velocity = pawns[i].check_collision(~np.isin(obj_array, [pawns[i].obj_number, 0]))
             # if i == 2:
                 # print("Printing Obj array\n", obj_array, pawns[i].sprite[0, 1], collision, "\n\n")
 
@@ -74,6 +75,13 @@ class Screen:
                 for j in objs:
                     if j != 0:
                         pawns[PAWN_DICT[j]].on_collision(pawns[i])
+                        if pawns[PAWN_DICT[j]].pawn_type == 4:
+                            self.game_score += 1
+                for j in objs:
+                    if j != 0 and pawns[PAWN_DICT[j]].is_solid is True:
+                        pawns[i].position = position
+                        pawns[i].velocity = velocity
+                        break
 
             if pawns[i].to_delete is False:
                 # print(pawns[i].obj_number)
@@ -105,7 +113,6 @@ class Screen:
 TERM_SCREEN = Screen()
 screen_dim = TERM_SCREEN.get_dim()
 
-
 TEST_GAMERULE = Gamerule(0.3)
 TEST_SHAPE = np.array([[' ', 'o', ' '],
                        ['/', '|', ' '],
@@ -133,11 +140,16 @@ GROUND_OBJ = Pawn(GROUND_SHAPE, [screen_dim[0] - int(screen_dim[0] * 0.1), 0],
 
 test_obj = Pawn(test_obj_shape, [13, 10], 2)
 
-TEST_PAWN = Actor(TEST_SHAPE, [4, 4], 4,  1.2, pawn_type=1)
-TEST_PAWN_2 = Actor(TEST_SHAPE_2, [4, 7], 5, 1, pawn_type=1, lives=2)
+TEST_PAWN = Actor(TEST_SHAPE, [4, 4], 4,  1, pawn_type=1)
+TEST_PAWN_2 = Actor(TEST_SHAPE_2, [4, 6], 5, 0.6, pawn_type=1, lives=2)
 test_firebeam = Firebeam([13, 4], 3)
 test_bullet = Bullet([4, 10], 6, 0.01, 0)
-PAWN_ARRAY = np.array([GROUND_OBJ, test_obj, test_firebeam, TEST_PAWN_2, test_bullet])
+PAWN_LIST = [GROUND_OBJ, test_obj, test_firebeam, TEST_PAWN_2, test_bullet]
+for i in range(4):
+    a = Coin([i + 20, 7], i + 10)
+    PAWN_LIST = PAWN_LIST[:1+i] + [a] + PAWN_LIST[1 + i:]  
+
+PAWN_ARRAY = np.array(PAWN_LIST)
 
 PAWN_DICT = {}
 
@@ -150,7 +162,8 @@ while True:
         PAWN_ARRAY[i] = TEST_GAMERULE.simulate_physics(PAWN_ARRAY[i])
     to_delete = TERM_SCREEN.add_pawn(PAWN_ARRAY)
     PAWN_ARRAY = np.delete(PAWN_ARRAY, to_delete)
-    TERM_SCREEN.draw()
+    print(TERM_SCREEN.game_score)
+    # TERM_SCREEN.draw()
 
 # The position and the velocity keeps on increasing despite the ground
 # How will this work?

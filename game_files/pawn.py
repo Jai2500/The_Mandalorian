@@ -3,7 +3,7 @@ import numpy as np
 
 class Pawn:
     def __init__(self, sprite, position, obj_number, mass=0, pawn_type=0,
-                 lives=1, drag_coeff=0.3):
+                 lives=1, drag_coeff=0.3, is_solid=True):
         self.mass = mass
         self.sprite = sprite
         self.velocity = np.array([0, 0], dtype=np.float64)
@@ -14,6 +14,7 @@ class Pawn:
         self.to_delete = False
         self.lives = lives
         self.drag_coeff = drag_coeff
+        self.is_solid = is_solid
         # print(self.sprite.shape)
 
     def create_collision_box(self, obj_shape):
@@ -23,9 +24,9 @@ class Pawn:
     def check_collision(self, out_arr):
         overlap_box = self.collision_box * out_arr
         if np.sum(overlap_box) > 0:
-            return True
+            return True, self.position, self.velocity
         else:
-            return False
+            return False, self.position, self.velocity
 
     def on_trigger(self, other):
         pass
@@ -82,11 +83,11 @@ class Actor(Pawn):
         #         row_sums = np.sum(overlap_box, axis = 1)
         #         non_zero = np.nonzero(row_sums)[0]
 
-            self.position = self.position + mpv
-            self.velocity = self.velocity * (mpv == 0)
-            return True
+            new_position = self.position + mpv
+            new_velocity = self.velocity * (mpv == 0)
+            return True, new_position, new_velocity
 
-        return False
+        return False, self.position, self.velocity
 
 
 class Bullet(Actor):
@@ -102,7 +103,17 @@ class Bullet(Actor):
 
 
 
+class Coin(Pawn):
 
+    sprite = np.array(['o']).reshape(1, 1)
+
+    def __init__(self, position, obj_number):
+        super().__init__(self.sprite, position, obj_number, pawn_type=4, is_solid=False)
+
+    def on_collision(self, other):
+        if other.pawn_type == 1:
+            self.die()
+            return 1
 
 
 

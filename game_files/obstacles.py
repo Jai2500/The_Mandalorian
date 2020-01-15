@@ -15,7 +15,7 @@ class Firebeam(Pawn):
             return np.array(['*'] + ['-'] * (self.size - 2) + ['*']).reshape(1, self.size)
         elif self.type == 2:
             # print("E2")
-            return np.array(['*'] + ['-'] * (self.size - 2) + ['*']).reshape(
+            return np.array(['*'] + ['|'] * (self.size - 2) + ['*']).reshape(
                 self.size, 1)
         else:
             sprite = []
