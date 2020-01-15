@@ -2,15 +2,18 @@ import numpy as np
 
 
 class Pawn:
-    def __init__(self, sprite, position, mass=0, is_player=False, lives=1):
+    def __init__(self, sprite, position, obj_number, mass=0, pawn_type=0,
+                 lives=1, drag_coeff=0.3):
         self.mass = mass
         self.sprite = sprite
         self.velocity = np.array([0, 0], dtype=np.float64)
         self.collision_box = self.create_collision_box(sprite)
         self.position = np.array(position, dtype=np.float64)
-        self.is_player = is_player
+        self.obj_number = obj_number
+        self.pawn_type = pawn_type
         self.to_delete = False
         self.lives = lives
+        self.drag_coeff = drag_coeff
         # print(self.sprite.shape)
 
     def create_collision_box(self, obj_shape):
@@ -44,7 +47,6 @@ class Actor(Pawn):
     def check_collision(self, out_arr):
 
         overlap_box = self.collision_box * out_arr
-        # print(overlap_box, self.sprite[0])
 
         # Version 1.2 based on the Z-index
         # Possible issues: -- Way to compare the Z-index
@@ -85,6 +87,25 @@ class Actor(Pawn):
             return True
 
         return False
+
+
+class Bullet(Actor):
+
+    sprite = np.array(['-', '-', '>']).reshape(1, 3)
+
+    def __init__(self, position, obj_number, drag_coeff, mass=0):
+        super().__init__(self.sprite, position, obj_number, mass=mass,
+                         drag_coeff=drag_coeff, pawn_type=2)
+        self.velocity[1] += 5
+
+
+
+
+
+
+
+
+
 
 
 # Refactor code -->
