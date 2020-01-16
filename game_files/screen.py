@@ -7,7 +7,7 @@ import colorama as cl
 import numpy as np
 from pawn import Actor, Pawn, Bullet, Coin
 from gamerule import Gamerule
-from obstacles import Firebeam
+from obstacles import Firebeam, Magnet
 
 cl.init()
 BG_BLUE = cl.Back.BLUE
@@ -135,37 +135,53 @@ GROUND_SHAPE = np.array([['-' for i in range(screen_dim[1])]
                         for j in range(int(screen_dim[0] * 0.1))],
                         dtype='<U100')
 
+ROOF_SHAPE = np.array([['-' for i in range(screen_dim[1])]],
+                      dtype='<U100').reshape(1, screen_dim[1])
+
+
 GROUND_OBJ = Pawn(GROUND_SHAPE, [screen_dim[0] - int(screen_dim[0] * 0.1), 0],
                   1, 0)
 
-test_obj = Pawn(test_obj_shape, [13, 10], 2)
+ROOF_OBJ = Pawn(ROOF_SHAPE, [0, 0], 10, 0)
 
+test_obj = Pawn(test_obj_shape, [13, 10], 2)
+test_magnet = Magnet([14, 12], 8, force_const=0.8)
 TEST_PAWN = Actor(TEST_SHAPE, [4, 4], 4,  1, pawn_type=1)
-TEST_PAWN_2 = Actor(TEST_SHAPE_2, [4, 6], 5, 0.6, pawn_type=1, lives=2)
+TEST_PAWN_2 = Actor(TEST_SHAPE_2, [4, 12], 5, 0.6, pawn_type=1, lives=2)
 test_firebeam = Firebeam([13, 4], 3)
 test_bullet = Bullet([4, 10], 6, 0.01, 0)
-PAWN_LIST = [GROUND_OBJ, test_obj, test_firebeam, TEST_PAWN_2, test_bullet]
-for i in range(4):
-    a = Coin([i + 20, 7], i + 10)
-    PAWN_LIST = PAWN_LIST[:1+i] + [a] + PAWN_LIST[1 + i:]  
+PAWN_LIST = [GROUND_OBJ, test_obj, test_magnet, TEST_PAWN_2]
+
+# for i in range(5):
+#     a = Coin([i + 20, 7], i + 10)
+#     PAWN_LIST = PAWN_LIST[:1+i] + [a] + PAWN_LIST[1 + i:]  
 
 PAWN_ARRAY = np.array(PAWN_LIST)
-
+MAGNET_LIST = [3]
 PAWN_DICT = {}
 
 # print(test_firebeam.type, test_firebeam.size)
-
+_ = TERM_SCREEN.add_pawn(PAWN_ARRAY)
 while True:
+    # print(PAWN_DICT)
     time.sleep(0.1)
     TERM_SCREEN.reset_screen()
+    # for i in MAGNET_LIST:
+        # print(i)
+        # print(PAWN_ARRAY[8])
+    PAWN_ARRAY[PAWN_DICT[5]] = PAWN_ARRAY[PAWN_DICT[8]].on_trigger(PAWN_ARRAY[PAWN_DICT[5]])
+        # print(PAWN_ARRAY[4])
     for i in range(len(PAWN_ARRAY)):
         PAWN_ARRAY[i] = TEST_GAMERULE.simulate_physics(PAWN_ARRAY[i])
     to_delete = TERM_SCREEN.add_pawn(PAWN_ARRAY)
     PAWN_ARRAY = np.delete(PAWN_ARRAY, to_delete)
-    print(TERM_SCREEN.game_score)
-    # TERM_SCREEN.draw()
+    # print(TERM_SCREEN.game_score)
+    TERM_SCREEN.draw()
 
 # The position and the velocity keeps on increasing despite the ground
 # How will this work?
 # A fore and back cycle that first prints the fore and then the back ?
 # Make a dictionary that refers object number to the object
+
+# Make a dictionary of the magnets present on the screen and check for that with the isin command before deleting so that I can again go back to doing everything
+# Update the object dictionary through an update dictionary option

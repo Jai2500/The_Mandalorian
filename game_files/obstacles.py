@@ -21,8 +21,8 @@ class Firebeam(Pawn):
             sprite = []
             for i in range(self.size):
                 sprite.append(
-                              [' '] * i + ['*'] + [' '] * (self.size - i - 1)
-                              )
+                    [' '] * i + ['*'] + [' '] * (self.size - i - 1)
+                )
             return np.array(sprite)
 
     def on_collision(self, other):
@@ -38,3 +38,31 @@ class Firebeam(Pawn):
                 self.die()
             else:
                 other.die()
+
+
+class Magnet(Pawn):
+    sprite = np.array([['|', '|'],
+                       ['-', '-']])
+
+    def __init__(self, position, obj_number, lives=1, force_const= 0.05):
+        super().__init__(self.sprite, position, obj_number, lives=lives, pawn_type=5)
+        self.force_const = force_const
+        self.velocity[1] = 0.5
+        self.drag_coeff = 0
+
+    def on_trigger(self, pawn):
+        # print("Entered here")
+        dist = np.linalg.norm(self.position - pawn.position)
+        pawn.velocity[0] += self.force_const *\
+            np.round(self.position[0] - pawn.position[0]) / (dist**1.5 + 10)
+        pawn.velocity[1] += self.force_const *\
+            np.round(self.position[1] - pawn.position[1]) / (dist**1.5 + 10)
+        # print(dist, "dist")
+        # print(self.force_const * int(self.position[1] - pawn.position[1]) / (dist**2 + 1), "X")
+        # print(self.force_const * int(np.round(self.position[0] - pawn.position[0])) / (dist**2 + 1), "Y")
+        # print(pawn)
+        return pawn
+
+# Maybe try to reduce the velocity of the player by a constant times norm
+# of the distance between them for each successive frame
+# 1/r effectively
