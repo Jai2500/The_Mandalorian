@@ -28,7 +28,7 @@ class Pawn:
         else:
             return False, self.position, self.velocity
 
-    def on_trigger(self, other):
+    def on_trigger(self, pawn):
         pass
 
     def on_collision(self, other):
@@ -77,6 +77,11 @@ class Actor(Pawn):
                 if non_zero.size > 0:
                     mpv[1] = self.sprite.shape[1] - np.min(non_zero)
 
+            if (mpv[0] <= mpv[1]):
+                mpv[1] = 0
+            elif (mpv[1] < mpv[0]):
+                mpv[0] = 0
+
         # if np.sum(overlap_box) > 0:
         #     mpv = np.array([0,0])
         #     if self.velocity[0] != 0:
@@ -84,7 +89,9 @@ class Actor(Pawn):
         #         non_zero = np.nonzero(row_sums)[0]
 
             new_position = self.position + mpv
-            new_velocity = self.velocity * (mpv == 0)
+            new_velocity = - self.velocity * (mpv == 0)
+            # if self.pawn_type == 1:
+            #     print(new_velocity, "After collision")
             return True, new_position, new_velocity
 
         return False, self.position, self.velocity
@@ -124,3 +131,4 @@ class Coin(Pawn):
 # Actor similar to things that can move and can stop on collision
 # Maybe add a player class after this
 # Each of the obstacles will be individual classes
+# Do I need to revamp the system of force? 
