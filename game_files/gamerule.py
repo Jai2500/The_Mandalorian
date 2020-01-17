@@ -20,7 +20,6 @@ class Gamerule:
         pawn.velocity[1] += ((-1)**(pawn.velocity[1] > 0)) * pawn.drag_coeff \
             * pawn.velocity[1]
         pawn.position[1] += pawn.velocity[1]
-        
         # if pawn.pawn_type == 1:
         #     print(pawn.velocity, pawn.position)
         return pawn
