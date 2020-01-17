@@ -145,9 +145,9 @@ GROUND_OBJ = Pawn(GROUND_SHAPE, [screen_dim[0] - int(screen_dim[0] * 0.1), 0],
 ROOF_OBJ = Pawn(ROOF_SHAPE, [0, 0], 10, 0)
 
 test_obj = Pawn(test_obj_shape, [13, 10], 2)
-test_magnet = Magnet([14, 12], 8, force_const=0.8)
+test_magnet = Magnet([14, 12], 8, force_const=1.3)
 TEST_PAWN = Actor(TEST_SHAPE, [4, 4], 4,  1, pawn_type=1)
-TEST_PAWN_2 = Actor(TEST_SHAPE_2, [4, 12], 5, 0.6, pawn_type=1, lives=2)
+TEST_PAWN_2 = Actor(TEST_SHAPE_2, [4, 12], 5, 1, pawn_type=1, lives=2)
 test_firebeam = Firebeam([13, 4], 3)
 test_bullet = Bullet([4, 10], 6, 0.01, 0)
 PAWN_LIST = [GROUND_OBJ, test_obj, test_magnet, TEST_PAWN_2]

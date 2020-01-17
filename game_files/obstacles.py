@@ -53,8 +53,16 @@ class Magnet(Pawn):
     def on_trigger(self, pawn):
         # print("Entered here")
         dist = np.linalg.norm(self.position - pawn.position)
+        diff = self.position - pawn.position
         pawn.velocity[0] += self.force_const *\
-            np.round(self.position[0] - pawn.position[0]) / (dist**1.5 + 10)
+                np.round(diff[0]) / (dist**1.8 + 10)
+        
+        # if diff[0] > 0:
+        #     pawn.velocity[0] += min(self.force_const *\
+        #         np.round(diff[0]) / (dist**1.8 + 10), 0.5)
+        # else: 
+        #     pawn.velocity[0] += max(self.force_const *\
+        #         np.round(diff[0]) / (dist**1.5 + 10), -0.5)
         pawn.velocity[1] += self.force_const *\
             np.round(self.position[1] - pawn.position[1]) / (dist**1.5 + 10)
         # print(dist, "dist")

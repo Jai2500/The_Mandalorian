@@ -10,7 +10,7 @@ class Gamerule:
 
     def simulate_physics(self, pawn):
         # print(pawn)
-        pawn.velocity[0] += pawn.mass * self.gravity + ((-1)**(pawn.velocity[0]> 0)) * pawn.drag_coeff \
+        pawn.velocity[0] += pawn.mass * self.gravity + ((-1)**(pawn.velocity[0] > 0)) * pawn.drag_coeff \
             * pawn.velocity[0]
         if pawn.velocity[0] > 0:
             pawn.velocity[0] = min(pawn.velocity[0], 1)

@@ -77,7 +77,7 @@ class Actor(Pawn):
                 if non_zero.size > 0:
                     mpv[1] = self.sprite.shape[1] - np.min(non_zero)
 
-            if (mpv[0] < mpv[1]):
+            if (mpv[0] <= mpv[1]):
                 mpv[1] = 0
             elif (mpv[1] < mpv[0]):
                 mpv[0] = 0
