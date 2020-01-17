@@ -47,15 +47,16 @@ class Magnet(Pawn):
     def __init__(self, position, obj_number, lives=1, force_const= 0.05):
         super().__init__(self.sprite, position, obj_number, lives=lives, pawn_type=5)
         self.force_const = force_const
-        self.velocity[1] = 0.5
+        # self.velocity[1] = 0.5
         self.drag_coeff = 0
+        self.is_solid = False
 
     def on_trigger(self, pawn):
         # print("Entered here")
         dist = np.linalg.norm(self.position - pawn.position)
         diff = self.position - pawn.position
         pawn.velocity[0] += self.force_const *\
-                np.round(diff[0]) / (dist**1.8 + 10)
+                np.round(diff[0]) / (dist**1.4 + 10)
         
         # if diff[0] > 0:
         #     pawn.velocity[0] += min(self.force_const *\
@@ -64,7 +65,7 @@ class Magnet(Pawn):
         #     pawn.velocity[0] += max(self.force_const *\
         #         np.round(diff[0]) / (dist**1.5 + 10), -0.5)
         pawn.velocity[1] += self.force_const *\
-            np.round(self.position[1] - pawn.position[1]) / (dist**1.5 + 10)
+            np.round(diff[1]) / (dist**1.4 + 10)
         # print(dist, "dist")
         # print(self.force_const * int(self.position[1] - pawn.position[1]) / (dist**2 + 1), "X")
         # print(self.force_const * int(np.round(self.position[0] - pawn.position[0])) / (dist**2 + 1), "Y")
