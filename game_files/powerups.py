@@ -1,15 +1,16 @@
-from pawn import Pawn
 import numpy as np
+from pawn import Pawn
 
 
 class Speed_Boost(Pawn):
-    sprite = np.array([[')', ')']
-                       [')', ')']])
+    sprite = np.array([[')', ')'],
+                       [')', ')']]).reshape(2, 2)
 
-    def __init__(self, position, obj_number, boost_speed):
-        super().__init__(self.sprite, position, obj_number, pawn_type=7, is_solid=False)
-        self.boost_speed = boost_speed
+    def __init__(self, position, obj_number):
+        super().__init__(self.sprite, position, obj_number, pawn_type=2, is_solid=False)
+        self.is_activated = False
 
-
-class Shield(Actor):
-    
+    def on_collision(self, other):
+        if other.pawn_type == 8:
+            self.is_activated = True 
+            self.die()
