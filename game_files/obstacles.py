@@ -193,7 +193,7 @@ class Boss_Bullet(Pawn):
 
     def move(self, player, g_size):
         prob = 0.1
-        diff = self._position - player._position
+        diff = self._position - player.get_position()
         if np.random.random() < prob:
             if diff[0] > 0:
                 self._position[0] -= 1

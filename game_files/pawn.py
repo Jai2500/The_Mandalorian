@@ -160,8 +160,6 @@ class Actor(Pawn):
 
             new_position = self._position + mpv
             new_velocity = self._velocity - (mpv != 0) * self._velocity
-            # if self.pawn_type == 1:
-            #     print(new_velocity, "After collision")
             return True, new_position, new_velocity
 
         return False, self._position, self._velocity

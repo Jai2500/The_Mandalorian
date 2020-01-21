@@ -249,9 +249,25 @@ while(True):
     distance_moved += (std_velocity_frame + speed_boost)
 
 os.system('clear')
-print('\033[2H')
+print('\033[2H', cl.Style.RESET_ALL)
+
+win_string = cl.Back.BLACK + '''
+_/      _/    _/_/    _/    _/      _/          _/    _/_/    _/      _/   
+ _/  _/    _/    _/  _/    _/      _/          _/  _/    _/  _/_/    _/    
+  _/      _/    _/  _/    _/      _/    _/    _/  _/    _/  _/  _/  _/     
+ _/      _/    _/  _/    _/        _/  _/  _/    _/    _/  _/    _/_/      
+_/        _/_/      _/_/            _/  _/        _/_/    _/      _/  
+'''
+
+lose_string = cl.Back.BLACK + '''
+_/      _/    _/_/    _/    _/      _/          _/_/      _/_/_/  _/_/_/_/_/   
+ _/  _/    _/    _/  _/    _/      _/        _/    _/  _/            _/        
+  _/      _/    _/  _/    _/      _/        _/    _/    _/_/        _/         
+ _/      _/    _/  _/    _/      _/        _/    _/        _/      _/          
+_/        _/_/      _/_/        _/_/_/_/    _/_/    _/_/_/        _/   
+'''
 
 if win is True:
-    print("YAY! You Won")
+    print(win_string)
 else:
-    print("Oh No! You Lost")
+    print(lose_string)
