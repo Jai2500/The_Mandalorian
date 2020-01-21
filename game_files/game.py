@@ -3,9 +3,9 @@ import time
 from datetime import datetime
 import colorama as cl
 import numpy as np
-from pawn import Actor, Pawn, Bullet, Character
+from pawn import Pawn, Bullet, Character
 from gamerule import Gamerule
-from obstacles import Firebeam, Magnet, Boss_Enemy, Solid_Objects, Boss_Bullet
+from obstacles import Firebeam, Magnet, Boss_Enemy, Solid_Objects
 from kbhit import KBHit
 from powerups import Speed_Boost
 from collections import deque
@@ -30,16 +30,16 @@ GAMERULE = Gamerule(0.3)
 speed_boost = 0
 
 pawns = {
-    0: [],  # Ground + Roof
-    1: [],  # Coins
-    2: [],  # Speed Boost
-    3: [],  # Solid Objects
-    4: [],  # Firebeams
-    5: [],  # Magnets
-    6: [],  # Boss
-    7: [],  # Boss Bullets
-    8: [],  # Player
-    9: [],  # Player Bullets
+    0: deque([]),  # Ground + Roof
+    1: deque([]),  # Coins
+    2: deque([]),  # Speed Boost
+    3: deque([]),  # Solid Objects
+    4: deque([]),  # Firebeams
+    5: deque([]),  # Magnets
+    6: deque([]),  # Boss
+    7: deque([]),  # Boss Bullets
+    8: deque([]),  # Player
+    9: deque([]),  # Player Bullets
 }
 
 
@@ -53,8 +53,8 @@ def generate_spawn_order():
 
 def delete_pawns(to_delete):
     for pawn_type in pawns:
-        pawns[pawn_type] = [obj for obj in pawns[pawn_type] if obj.obj_number
-                            not in to_delete]
+        pawns[pawn_type] = deque([obj for obj in pawns[pawn_type] if obj.obj_number
+                            not in to_delete])
         # print(to_delete)
 
 
@@ -175,7 +175,7 @@ print('\x1B[?25l')
 
 while(True):
     time.sleep(0.033)
-    if distance_moved <= 2520:
+    if distance_moved <= 200:
         spawn_pawns()
     else:
         spawn_boss()
@@ -200,19 +200,13 @@ while(True):
 
     if _KBHIT.kbhit():
         inp = _KBHIT.getch().lower()
-        if inp == 'w':
-            pawns[8][0].velocity[0] -= 2
-        elif inp == 'a':
-            pawns[8][0].velocity[1] -= 1
-        elif inp == 'd':
-            pawns[8][0].velocity[1] += 1
+        if inp == 'q':
+            break
         elif inp == 'e':
             pawns[9].append(Bullet([pawns[8][0].position[0], pawns[8][0].position[1] + 2], ObjNumber, 0))
             ObjNumber += 1
-        elif inp == ' ':
-            pawns[8][0].activate_shield()
-        elif inp == 'q':
-            break
+        else:
+            pawns[8][0].control(inp)
 
     for i in range(len(pawns[5])):
         pawns[8][0] = pawns[5][i].on_trigger(pawns[8][0])

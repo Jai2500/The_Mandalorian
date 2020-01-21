@@ -58,30 +58,30 @@ class Screen:
             if pawns[i].pawn_type != 0:
                 if pos_y < 0:
                     pos_y = 1
-                elif pos_y + pawns[i].sprite.shape[0] >= g_size:
-                    pos_y = g_size - pawns[i].sprite.shape[0] 
+                elif pos_y + pawns[i].get_sprite().shape[0] >= g_size:
+                    pos_y = g_size - pawns[i].get_sprite().shape[0] 
 
             if pawns[i].pawn_type == 8:
                 if pos_x <= 0:
                     pos_x = 0
-                elif pos_x + pawns[i].sprite.shape[1] >= self.__screen_dim[1]:
-                    pos_x = self.__screen_dim[1] - pawns[i].sprite.shape[1]
-            
+                elif pos_x + pawns[i].get_sprite().shape[1] >= self.__screen_dim[1]:
+                    pos_x = self.__screen_dim[1] - pawns[i].get_sprite().shape[1]
+
             if pawns[i].position[1] > self.__screen_dim[1]:
                 pawns[i].to_delete = True
-            elif pawns[i].position[1] + pawns[i].sprite.shape[1] < 0:
+            elif pawns[i].position[1] + pawns[i].get_sprite().shape[1] < 0:
                 pawns[i].to_delete = True
 
             if pawns[i].to_delete is False:
                 obj_array = self.obj_arr[
-                    pos_y: pos_y + pawns[i].sprite.shape[0],
-                    max(0, pos_x): min(self.__screen_dim[1], pos_x + pawns[i].sprite.shape[1]),
+                    pos_y: pos_y + pawns[i].get_sprite().shape[0],
+                    max(0, pos_x): min(self.__screen_dim[1], pos_x + pawns[i].get_sprite().shape[1]),
                     ]
 
                 # PAWN_DICT[pawns[i].obj_number] = i
                 # print(pawns[i], pos_x, pos_y)
-    
-                collision_box_size = [max(0, -pos_x), min(self.__screen_dim[1] - pos_x, pawns[i].sprite.shape[1])]
+
+                collision_box_size = [max(0, -pos_x), min(self.__screen_dim[1] - pos_x, pawns[i].get_sprite().shape[1])]
 
                 collision, position, velocity = pawns[i].check_collision(~np.isin(obj_array, [pawns[i].obj_number, 0]), collision_box_size)
 
@@ -111,22 +111,22 @@ class Screen:
                 if pawns[i].pawn_type != 0:
                     if pos_y < 0:
                         pos_y = 1
-                    elif pos_y + pawns[i].sprite.shape[0] >= g_size:
-                        pos_y = g_size - pawns[i].sprite.shape[0]
+                    elif pos_y + pawns[i].get_sprite().shape[0] >= g_size:
+                        pos_y = g_size - pawns[i].get_sprite().shape[0]
 
                 if pawns[i].pawn_type == 8:
                     if pos_x < 0:
                         pos_x = 0
-                    elif pos_x + pawns[i].sprite.shape[1] >= self.__screen_dim[1]:
-                        pos_x = self.__screen_dim[1] - pawns[i].sprite.shape[1]
+                    elif pos_x + pawns[i].get_sprite().shape[1] >= self.__screen_dim[1]:
+                        pos_x = self.__screen_dim[1] - pawns[i].get_sprite().shape[1]
 
-                self.obj_arr[pos_y: pos_y + pawns[i].sprite.shape[0],
-                             max(0, pos_x): min(self.__screen_dim[1], pos_x + pawns[i].sprite.shape[1])] \
-                    = pawns[i].collision_box[:, max(0, - pos_x): min(self.__screen_dim[1] - pos_x, pawns[i].sprite.shape[1])] * pawns[i].obj_number
+                self.obj_arr[pos_y: pos_y + pawns[i].get_sprite().shape[0],
+                             max(0, pos_x): min(self.__screen_dim[1], pos_x + pawns[i].get_sprite().shape[1])] \
+                    = pawns[i].collision_box[:, max(0, - pos_x): min(self.__screen_dim[1] - pos_x, pawns[i].get_sprite().shape[1])] * pawns[i].obj_number
 
-                self.final_arr[pos_y: pos_y + pawns[i].sprite.shape[0],
-                               max(0, pos_x): min(self.__screen_dim[1], pos_x + pawns[i].sprite.shape[1])
-                               ] = pawns[i].sprite[:, max(0, - pos_x): min(self.__screen_dim[1] - pos_x, pawns[i].sprite.shape[1])]
+                self.final_arr[pos_y: pos_y + pawns[i].get_sprite().shape[0],
+                               max(0, pos_x): min(self.__screen_dim[1], pos_x + pawns[i].get_sprite().shape[1])
+                               ] = pawns[i].get_sprite()[:, max(0, - pos_x): min(self.__screen_dim[1] - pos_x, pawns[i].get_sprite().shape[1])]
             else:
                 to_delete.append(pawns[i].obj_number)
         return to_delete

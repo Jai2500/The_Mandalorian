@@ -4,8 +4,8 @@ from pawn import Pawn, Actor
 
 class Firebeam(Pawn):
     def __init__(self, position, obj_number, g_size, lives=1):
-        sprite = self.create_sprite(g_size, position)
-        super().__init__(sprite, position, obj_number, mass=0, pawn_type=4, lives=lives)
+        art = self.create_sprite(g_size, position)
+        super().__init__(art, position, obj_number, mass=0, pawn_type=4, lives=lives)
 
     def create_sprite(self, g_size, position):
         self.type = np.random.randint(1, 4)
@@ -42,11 +42,11 @@ class Firebeam(Pawn):
 
 
 class Magnet(Pawn):
-    sprite = np.array([['|', '|'],
+    art = np.array([['|', '|'],
                        ['-', '-']])
 
     def __init__(self, position, obj_number, lives=1, force_const=1.5):
-        super().__init__(self.sprite, position, obj_number, lives=lives, pawn_type=5)
+        super().__init__(self.art, position, obj_number, lives=lives, pawn_type=5)
         self.force_const = force_const
         # self.velocity[1] = 0.5
         self.drag_coeff = 0
@@ -57,21 +57,17 @@ class Magnet(Pawn):
         dist = np.linalg.norm(self.position - pawn.position)
         diff = self.position - pawn.position
         if pawn.shield_active is False:
-            pawn.velocity[0] += self.force_const *\
-                    np.round(diff[0]) / (dist**1.44 + 10)
-            
-            # if diff[0] > 0:
-            #     pawn.velocity[0] += min(self.force_const *\
-            #         np.round(diff[0]) / (dist**1.8 + 10), 0.5)
-            # else: 
-            #     pawn.velocity[0] += max(self.force_const *\
-            #         np.round(diff[0]) / (dist**1.5 + 10), -0.5)
-            pawn.velocity[1] += self.force_const *\
-                np.round(diff[1]) / (dist**1.44 + 10)
-            # print(dist, "dist")
-            # print(self.force_const * int(self.position[1] - pawn.position[1]) / (dist**2 + 1), "X")
-            # print(self.force_const * int(np.round(self.position[0] - pawn.position[0])) / (dist**2 + 1), "Y")
-            # print(pawn)
+            pawn_vel = pawn.get_velocity()
+            y_vel = pawn_vel[0] + self.force_const *\
+                    np.round(diff[0]) / (dist**1.44 + 10) 
+            # pawn._velocity[0] += self.force_const *\
+            #         np.round(diff[0]) / (dist**1.44 + 10)
+            x_vel = pawn_vel[1] + self.force_const *\
+                np.round(diff[1]) / (dist**1.44 + 10) 
+            # pawn.velocity[1] += self.force_const *\
+            #     np.round(diff[1]) / (dist**1.44 + 10)
+            pawn.set_velocity(np.array([y_vel, x_vel]))
+
         return pawn
 
 # Maybe try to reduce the velocity of the player by a constant times norm
@@ -82,8 +78,8 @@ class Magnet(Pawn):
 class Solid_Objects(Pawn):
 
     def __init__(self, position, obj_number, g_size, lives=1):
-        sprite = self.create_sprite(g_size, position)
-        super().__init__(sprite, position, obj_number, mass=0, pawn_type=3, lives=lives)
+        art = self.create_sprite(g_size, position)
+        super().__init__(art, position, obj_number, mass=0, pawn_type=3, lives=lives)
 
     def create_sprite(self, g_size, position):
         self.type = np.random.randint(1, 4)
@@ -138,9 +134,9 @@ class Boss_Enemy(Actor):
                     ______/ /'''.split('\n')
 
     def __init__(self, position, obj_number, lives):
-        sprite = self.generate_sprite()
-        super().__init__(sprite, position, obj_number, lives=lives)
-        print(sprite.shape)
+        art = self.generate_sprite()
+        super().__init__(art, position, obj_number, lives=lives)
+        # print(sprite.shape)
 
     def generate_sprite(self):
         m = 0
@@ -170,8 +166,8 @@ class Boss_Enemy(Actor):
 
             if self.position[0] < 1:
                 self.position[0] = 1
-            if self.position[0] + self.sprite.shape[0] >= g_size:
-                self.position[0] = g_size - self.sprite.shape[0]
+            if self.position[0] + self._sprite.shape[0] >= g_size:
+                self.position[0] = g_size - self._sprite.shape[0]
 
     def on_collision(self, other):
         if other.pawn_type == 9:
@@ -181,18 +177,18 @@ class Boss_Enemy(Actor):
             other.die()
 
     def launch_bullet(self, obj_number):
-        y = np.random.randint(0, self.sprite.shape[0])
+        y = np.random.randint(0, self._sprite.shape[0])
         return Boss_Bullet([self.position[0] + y, self.position[1] - 4], obj_number)
 
 
 class Boss_Bullet(Pawn):
-    sprite = np.array([['<', '-', '-', '|'],
+    art = np.array([['<', '-', '-', '|'],
                        ['<', '-', '-', '|']])
 
     def __init__(self, position, obj_number):
-        super().__init__(self.sprite, position, obj_number, pawn_type=7, 
+        super().__init__(self.art, position, obj_number, pawn_type=7, 
                          is_solid=False, lives=2)
-        self.velocity[1] = - 2
+        self._velocity[1] = - 2
         self.is_solid = False
 
     def move(self, player, g_size):
@@ -211,8 +207,8 @@ class Boss_Bullet(Pawn):
 
             if self.position[0] < 1:
                 self.position[0] = 1
-            if self.position[0] + self.sprite.shape[0] >= g_size:
-                self.position[0] = g_size - self.sprite.shape[0]
+            if self.position[0] + self._sprite.shape[0] >= g_size:
+                self.position[0] = g_size - self._sprite.shape[0]
 
     def on_collision(self, other):
         if other.pawn_type == 9:

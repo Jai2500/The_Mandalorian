@@ -5,9 +5,9 @@ from datetime import datetime
 class Pawn:
     def __init__(self, sprite, position, obj_number, mass=0, pawn_type=0,
                  lives=1, drag_coeff=0.0, is_solid=True, max_velo=[5, 5]):
-        self.mass = mass
-        self.sprite = sprite
-        self.velocity = np.array([0, 0], dtype=np.float64)
+        self._mass = mass
+        self._sprite = sprite
+        self._velocity = np.array([0, 0], dtype=np.float64)
         self.collision_box = self.create_collision_box(sprite)
         self.position = np.array(position, dtype=np.float64)
         self.obj_number = obj_number
@@ -19,6 +19,18 @@ class Pawn:
         self.max_velo = max_velo
         # print(self.sprite.shape)
 
+    def get_mass(self):
+        return self._mass
+
+    def get_sprite(self):
+        return self._sprite
+
+    def get_velocity(self):
+        return self._velocity
+
+    def set_velocity(self, velocity):
+        self._velocity = velocity
+
     def create_collision_box(self, obj_shape):
         collision_box = obj_shape != ' '
         return collision_box
@@ -26,18 +38,15 @@ class Pawn:
     def check_collision(self, out_arr, collision_box_size):
         overlap_box = self.collision_box[:, collision_box_size[0]:collision_box_size[1]] * out_arr
         if np.sum(overlap_box) > 0:
-            return True, self.position, self.velocity
+            return True, self.position, self._velocity
         else:
-            return False, self.position, self.velocity
+            return False, self.position, self._velocity
 
     def on_trigger(self, pawn):
         pass
 
     def on_collision(self, other):
         return "The object has collided"
-
-    def get_sprite(self):
-        return self.sprite, self.collision_box
 
     def die(self):
         self.lives -= 1
@@ -56,28 +65,28 @@ class Actor(Pawn):
 
         if np.sum(overlap_box) > 0:
             mpv = np.array([10000, 10000])
-            if self.velocity[0] > 0.0:
+            if self._velocity[0] > 0.0:
                 row_sums = np.sum(overlap_box, axis=1)
                 non_zero = np.nonzero(row_sums)[0]
                 if non_zero.size > 0:
-                    mpv[0] = -1 * (self.sprite.shape[0] -
+                    mpv[0] = -1 * (self._sprite.shape[0] -
                                    np.min(non_zero))
-            elif self.velocity[0] < 0.0:
+            elif self._velocity[0] < 0.0:
                 row_sums = np.sum(overlap_box, axis=1)
                 non_zero = np.nonzero(row_sums)[0]
                 if non_zero.size > 0:
                     mpv[0] = np.max(non_zero)
 
-            if self.velocity[1] > 0.0:
+            if self._velocity[1] > 0.0:
                 col_sums = np.sum(overlap_box, axis=0)
                 non_zero = np.nonzero(col_sums)[0]
                 if non_zero.size > 0:
                     mpv[1] = -1 * np.max(non_zero)
-            elif self.velocity[1] < 0.0:
+            elif self._velocity[1] < 0.0:
                 col_sums = np.sum(overlap_box, axis=0)
                 non_zero = np.nonzero(col_sums)[0]
                 if non_zero.size > 0:
-                    mpv[1] = self.sprite.shape[1] - np.min(non_zero)
+                    mpv[1] = self._sprite.shape[1] - np.min(non_zero)
 
         # if np.sum(overlap_box) > 0:
         #     mpv = np.array([0, 0])
@@ -118,12 +127,12 @@ class Actor(Pawn):
         #         non_zero = np.nonzero(row_sums)[0]
 
             new_position = self.position + mpv
-            new_velocity = self.velocity - (mpv != 0) * self.velocity
+            new_velocity = self._velocity - (mpv != 0) * self._velocity
             # if self.pawn_type == 1:
             #     print(new_velocity, "After collision")
             return True, new_position, new_velocity
 
-        return False, self.position, self.velocity
+        return False, self.position, self._velocity
 
 
 class Character(Actor):
@@ -133,13 +142,13 @@ class Character(Actor):
         super().__init__(sprite, position, obj_number, mass, pawn_type, lives,
                          drag_coeff, is_solid, max_velo=[2, 2])
         self.shield_active = False
-        self.normal_sprite = self.sprite
+        self.normal_sprite = self._sprite
         self.curr_lives = self.lives
         self.normal_collision_box = self.create_collision_box(self.normal_sprite)
         self.timestamp = datetime.now()
         if shield_sprite is None:
-            self.shield_sprite = np.array([['O' for i in range(self.sprite.shape[1] + 2)] for j in range(self.sprite.shape[0] + 2)])
-            self.shield_sprite[1:1 + self.sprite.shape[0], 1:self.sprite.shape[1] + 1] = self.sprite
+            self.shield_sprite = np.array([['O' for i in range(self._sprite.shape[1] + 2)] for j in range(self.get_sprite().shape[0] + 2)])
+            self.shield_sprite[1:1 + self._sprite.shape[0], 1:self._sprite.shape[1] + 1] = self.get_sprite()
         else:
             self.shield_sprite = shield_sprite
         self.shield_collision_box = self.create_collision_box(self.shield_sprite)
@@ -152,7 +161,7 @@ class Character(Actor):
         now = datetime.now()
         if (now - self.timestamp).seconds > 5:
             self.shield_active = True
-            self.sprite = self.shield_sprite
+            self._sprite = self.shield_sprite 
             self.collision_box = self.shield_collision_box
             self.timestamp = now
             self.curr_lives = self.lives
@@ -164,21 +173,31 @@ class Character(Actor):
             return
 
         self.shield_active = False
-        self.sprite = self.normal_sprite
+        self._sprite = self.normal_sprite
         self.collision_box = self.normal_collision_box
         self.timestamp = datetime.now()
         self.lives = self.curr_lives
         return
 
+    def control(self, inp):
+        if inp == 'w':
+            self._velocity[0] -= 2
+        elif inp == 'a':
+            self._velocity[1] -= 1
+        elif inp == 'd':
+            self._velocity[1] += 1
+        elif inp == ' ':
+            self.activate_shield()
+
 
 class Bullet(Pawn):
 
-    sprite = np.array(['>', '-', '-', '-', '-', '>']).reshape(1, 6)
+    art = np.array(['>', '-', '-', '-', '-', '>']).reshape(1, 6)
 
     def __init__(self, position, obj_number, drag_coeff, mass=0):
-        super().__init__(self.sprite, position, obj_number, mass=mass,
+        super().__init__(self.art, position, obj_number, mass=mass,
                          drag_coeff=drag_coeff, pawn_type=9, max_velo=[0,3])
-        self.velocity[1] = 3
+        self._velocity[1] = 3
         self.is_solid = False
 
 
