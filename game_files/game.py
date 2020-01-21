@@ -194,8 +194,8 @@ while(True):
     TERM_SCREEN.reset_screen()
 
     for i in range(len(pawns[8])):
-        if pawns[8][i].shield_active is True:
-            if (now - pawns[8][i].timestamp).seconds > 5:
+        if pawns[8][i].get_shield_active() is True:
+            if (now - pawns[8][i].get_timestamp()).seconds > 5:
                 pawns[8][i].deactivate_shield()
 
     if _KBHIT.kbhit():

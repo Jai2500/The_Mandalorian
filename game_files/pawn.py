@@ -17,7 +17,6 @@ class Pawn:
         self._drag_coeff = drag_coeff
         self._is_solid = is_solid
         self._max_velo = max_velo
-        # print(self.sprite.shape)
 
     def get_mass(self):
         return self._mass
@@ -174,42 +173,54 @@ class Character(Actor):
                  lives=1, drag_coeff=0.3, is_solid=True, shield_sprite = None):
         super().__init__(sprite, position, obj_number, mass, pawn_type, lives,
                          drag_coeff, is_solid, max_velo=[2, 2])
-        self.shield_active = False
-        self.normal_sprite = self._sprite
-        self.curr_lives = self._lives
-        self.normal_collision_box = self.create_collision_box(self.normal_sprite)
-        self.timestamp = datetime.now()
+        self.__shield_active = False
+        self.__normal_sprite = self._sprite
+        self.__curr_lives = self._lives
+        self.__normal_collision_box = self.create_collision_box(self.__normal_sprite)
+        self.__timestamp = datetime.now()
         if shield_sprite is None:
-            self.shield_sprite = np.array([['O' for i in range(self._sprite.shape[1] + 2)] for j in range(self.get_sprite().shape[0] + 2)])
-            self.shield_sprite[1:1 + self._sprite.shape[0], 1:self._sprite.shape[1] + 1] = self.get_sprite()
+            self.__shield_sprite = np.array([['O' for i in range(self._sprite.shape[1] + 2)] for j in range(self.get_sprite().shape[0] + 2)])
+            self.__shield_sprite[1:1 + self._sprite.shape[0], 1:self._sprite.shape[1] + 1] = self.get_sprite()
         else:
-            self.shield_sprite = shield_sprite
-        self.shield_collision_box = self.create_collision_box(self.shield_sprite)
-        self.score = 0
+            self.__shield_sprite = shield_sprite
+        self.__shield_collision_box = self.create_collision_box(self.__shield_sprite)
+        self.__score = 0
+
+    def get_shield_active(self):
+        return self.__shield_active
+
+    def get_timestamp(self):
+        return self.__timestamp
+
+    def get_score(self):
+        return self.__score
+
+    def set_score(self, score):
+        self.__score = score
 
     def activate_shield(self):
-        if self.shield_active is True:
+        if self.__shield_active is True:
             return
 
         now = datetime.now()
-        if (now - self.timestamp).seconds > 5:
-            self.shield_active = True
-            self._sprite = self.shield_sprite 
-            self._collision_box = self.shield_collision_box
-            self.timestamp = now
-            self.curr_lives = self._lives
+        if (now - self.__timestamp).seconds > 5:
+            self.__shield_active = True
+            self._sprite = self.__shield_sprite 
+            self._collision_box = self.__shield_collision_box
+            self.__timestamp = now
+            self.__curr_lives = self._lives
             self._lives = 100000000
             return
 
     def deactivate_shield(self):
-        if self.shield_active is False:
+        if self.__shield_active is False:
             return
 
-        self.shield_active = False
-        self._sprite = self.normal_sprite
-        self._collision_box = self.normal_collision_box
-        self.timestamp = datetime.now()
-        self._lives = self.curr_lives
+        self.__shield_active = False
+        self._sprite = self.__normal_sprite
+        self._collision_box = self.__normal_collision_box
+        self.__timestamp = datetime.now()
+        self._lives = self.__curr_lives
         return
 
     def control(self, inp):

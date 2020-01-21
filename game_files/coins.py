@@ -10,6 +10,6 @@ class Coin(Pawn):
 
     def on_collision(self, other):
         if other.get_pawn_type() == 8:
-            other.score += 1
+            other.set_score(other.get_score() + 1)
             self.die()
             return 1

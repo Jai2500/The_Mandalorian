@@ -56,7 +56,7 @@ class Magnet(Pawn):
         # print("Entered here")
         dist = np.linalg.norm(self._position - pawn.get_position())
         diff = self._position - pawn.get_position()
-        if pawn.shield_active is False:
+        if pawn.get_shield_active() is False:
             pawn_vel = pawn.get_velocity()
             y_vel = pawn_vel[0] + self.force_const *\
                     np.round(diff[0]) / (dist**1.44 + 10) 
@@ -106,7 +106,7 @@ class Solid_Objects(Pawn):
     def on_collision(self, other):
 
         if other.get_pawn_type() == 8:
-            if other.shield_active is True:
+            if other.get_shield_active() is True:
                 self.die()
         elif other.get_pawn_type() == 9:
             other.die
@@ -214,7 +214,7 @@ class Boss_Bullet(Pawn):
         if other.get_pawn_type() == 9:
             self.die()
         elif other.get_pawn_type() == 8:
-            if other.shield_active is False:
+            if other.get_shield_active() is False:
                 self._lives = 1
                 self.die()
                 other.die()
