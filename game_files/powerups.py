@@ -11,6 +11,6 @@ class Speed_Boost(Pawn):
         self.is_activated = False
 
     def on_collision(self, other):
-        if other.pawn_type == 8:
+        if other.get_pawn_type() == 8:
             self.is_activated = True 
             self.die()

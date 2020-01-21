@@ -52,27 +52,27 @@ class Screen:
     def add_pawn(self, pawns, g_size):
         to_delete = []
         for i in range(len(pawns)):
-            pos_x = int(np.round(pawns[i].position[1]))
-            pos_y = int(np.round(pawns[i].position[0]))
+            pos_x = int(np.round(pawns[i].get_position()[1]))
+            pos_y = int(np.round(pawns[i].get_position()[0]))
 
-            if pawns[i].pawn_type != 0:
+            if pawns[i].get_pawn_type() != 0:
                 if pos_y < 0:
                     pos_y = 1
                 elif pos_y + pawns[i].get_sprite().shape[0] >= g_size:
                     pos_y = g_size - pawns[i].get_sprite().shape[0] 
 
-            if pawns[i].pawn_type == 8:
+            if pawns[i].get_pawn_type() == 8:
                 if pos_x <= 0:
                     pos_x = 0
                 elif pos_x + pawns[i].get_sprite().shape[1] >= self.__screen_dim[1]:
                     pos_x = self.__screen_dim[1] - pawns[i].get_sprite().shape[1]
 
-            if pawns[i].position[1] > self.__screen_dim[1]:
-                pawns[i].to_delete = True
-            elif pawns[i].position[1] + pawns[i].get_sprite().shape[1] < 0:
-                pawns[i].to_delete = True
+            if pawns[i].get_position()[1] > self.__screen_dim[1]:
+                pawns[i].set_to_delete(True)
+            elif pawns[i].get_position()[1] + pawns[i].get_sprite().shape[1] < 0:
+                pawns[i].set_to_delete(True)
 
-            if pawns[i].to_delete is False:
+            if pawns[i].get_to_delete() is False:
                 obj_array = self.obj_arr[
                     pos_y: pos_y + pawns[i].get_sprite().shape[0],
                     max(0, pos_x): min(self.__screen_dim[1], pos_x + pawns[i].get_sprite().shape[1]),
@@ -83,38 +83,38 @@ class Screen:
 
                 collision_box_size = [max(0, -pos_x), min(self.__screen_dim[1] - pos_x, pawns[i].get_sprite().shape[1])]
 
-                collision, position, velocity = pawns[i].check_collision(~np.isin(obj_array, [pawns[i].obj_number, 0]), collision_box_size)
+                collision, position, velocity = pawns[i].check_collision(~np.isin(obj_array, [pawns[i].get_obj_number(), 0]), collision_box_size)
 
                 if collision is True:
                     objs = np.unique(obj_array)
                     for j in objs:
                         if j != 0:
                             for k in range(len(pawns)):
-                                if pawns[k].obj_number == j:
+                                if pawns[k].get_obj_number() == j:
                                     pawns[k].on_collision(pawns[i])
-                                if pawns[k].pawn_type == 1:
+                                if pawns[k].get_pawn_type() == 1:
                                     self.game_score += 1
                     for j in objs:
                         if j != 0:
                             for k in range(len(pawns)):
-                                if pawns[k].obj_number == j:
-                                    if pawns[k].is_solid is True:
-                                        pawns[i].position = position
-                                        pawns[i].velocity = velocity
+                                if pawns[k].get_obj_number() == j:
+                                    if pawns[k].get_is_solid() is True:
+                                        pawns[i].set_position(position)
+                                        pawns[i].set_velocity(velocity)
                                         break
 
-            if pawns[i].to_delete is False:
+            if pawns[i].get_to_delete() is False:
 
-                pos_x = int(np.round(pawns[i].position[1]))
-                pos_y = int(np.round(pawns[i].position[0]))
+                pos_x = int(np.round(pawns[i].get_position()[1]))
+                pos_y = int(np.round(pawns[i].get_position()[0]))
 
-                if pawns[i].pawn_type != 0:
+                if pawns[i].get_pawn_type() != 0:
                     if pos_y < 0:
                         pos_y = 1
                     elif pos_y + pawns[i].get_sprite().shape[0] >= g_size:
                         pos_y = g_size - pawns[i].get_sprite().shape[0]
 
-                if pawns[i].pawn_type == 8:
+                if pawns[i].get_pawn_type() == 8:
                     if pos_x < 0:
                         pos_x = 0
                     elif pos_x + pawns[i].get_sprite().shape[1] >= self.__screen_dim[1]:
@@ -122,13 +122,13 @@ class Screen:
 
                 self.obj_arr[pos_y: pos_y + pawns[i].get_sprite().shape[0],
                              max(0, pos_x): min(self.__screen_dim[1], pos_x + pawns[i].get_sprite().shape[1])] \
-                    = pawns[i].collision_box[:, max(0, - pos_x): min(self.__screen_dim[1] - pos_x, pawns[i].get_sprite().shape[1])] * pawns[i].obj_number
+                    = pawns[i].get_collision_box()[:, max(0, - pos_x): min(self.__screen_dim[1] - pos_x, pawns[i].get_sprite().shape[1])] * pawns[i].get_obj_number()
 
                 self.final_arr[pos_y: pos_y + pawns[i].get_sprite().shape[0],
                                max(0, pos_x): min(self.__screen_dim[1], pos_x + pawns[i].get_sprite().shape[1])
                                ] = pawns[i].get_sprite()[:, max(0, - pos_x): min(self.__screen_dim[1] - pos_x, pawns[i].get_sprite().shape[1])]
             else:
-                to_delete.append(pawns[i].obj_number)
+                to_delete.append(pawns[i].get_obj_number())
         return to_delete
 
     def draw(self):

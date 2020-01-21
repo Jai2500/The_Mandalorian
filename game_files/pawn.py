@@ -8,15 +8,15 @@ class Pawn:
         self._mass = mass
         self._sprite = sprite
         self._velocity = np.array([0, 0], dtype=np.float64)
-        self.collision_box = self.create_collision_box(sprite)
-        self.position = np.array(position, dtype=np.float64)
-        self.obj_number = obj_number
-        self.pawn_type = pawn_type
-        self.to_delete = False
-        self.lives = lives
-        self.drag_coeff = drag_coeff
-        self.is_solid = is_solid
-        self.max_velo = max_velo
+        self._collision_box = self.create_collision_box(sprite)
+        self._position = np.array(position, dtype=np.float64)
+        self._obj_number = obj_number
+        self._pawn_type = pawn_type
+        self._to_delete = False
+        self._lives = lives
+        self._drag_coeff = drag_coeff
+        self._is_solid = is_solid
+        self._max_velo = max_velo
         # print(self.sprite.shape)
 
     def get_mass(self):
@@ -31,16 +31,49 @@ class Pawn:
     def set_velocity(self, velocity):
         self._velocity = velocity
 
+    def get_collision_box(self):
+        return self._collision_box
+
+    def get_position(self):
+        return self._position
+
+    def set_position(self, position):
+        self._position = position
+
+    def get_obj_number(self):
+        return self._obj_number
+
+    def get_pawn_type(self):
+        return self._pawn_type
+
+    def get_to_delete(self):
+        return self._to_delete
+
+    def get_lives(self):
+        return self._lives
+
+    def get_drag_coeff(self):
+        return self._drag_coeff
+
+    def get_is_solid(self):
+        return self._is_solid
+
+    def get_max_velo(self):
+        return self._max_velo
+
+    def set_to_delete(self, to_delete):
+        self._to_delete = to_delete
+
     def create_collision_box(self, obj_shape):
         collision_box = obj_shape != ' '
         return collision_box
 
     def check_collision(self, out_arr, collision_box_size):
-        overlap_box = self.collision_box[:, collision_box_size[0]:collision_box_size[1]] * out_arr
+        overlap_box = self._collision_box[:, collision_box_size[0]:collision_box_size[1]] * out_arr
         if np.sum(overlap_box) > 0:
-            return True, self.position, self._velocity
+            return True, self._position, self._velocity
         else:
-            return False, self.position, self._velocity
+            return False, self._position, self._velocity
 
     def on_trigger(self, pawn):
         pass
@@ -49,16 +82,16 @@ class Pawn:
         return "The object has collided"
 
     def die(self):
-        self.lives -= 1
-        if self.lives <= 0:
-            self.to_delete = True
+        self._lives -= 1
+        if self._lives <= 0:
+            self._to_delete = True
 
 
 class Actor(Pawn):
 
     def check_collision(self, out_arr, collision_box_size):
         # print(out_arr.shape)
-        overlap_box = self.collision_box[:, collision_box_size[0]:collision_box_size[1]] * out_arr
+        overlap_box = self._collision_box[:, collision_box_size[0]:collision_box_size[1]] * out_arr
 
         # Version 1.2 based on the Z-index
         # Possible issues: -- Way to compare the Z-index
@@ -126,13 +159,13 @@ class Actor(Pawn):
         #         row_sums = np.sum(overlap_box, axis = 1)
         #         non_zero = np.nonzero(row_sums)[0]
 
-            new_position = self.position + mpv
+            new_position = self._position + mpv
             new_velocity = self._velocity - (mpv != 0) * self._velocity
             # if self.pawn_type == 1:
             #     print(new_velocity, "After collision")
             return True, new_position, new_velocity
 
-        return False, self.position, self._velocity
+        return False, self._position, self._velocity
 
 
 class Character(Actor):
@@ -143,7 +176,7 @@ class Character(Actor):
                          drag_coeff, is_solid, max_velo=[2, 2])
         self.shield_active = False
         self.normal_sprite = self._sprite
-        self.curr_lives = self.lives
+        self.curr_lives = self._lives
         self.normal_collision_box = self.create_collision_box(self.normal_sprite)
         self.timestamp = datetime.now()
         if shield_sprite is None:
@@ -162,10 +195,10 @@ class Character(Actor):
         if (now - self.timestamp).seconds > 5:
             self.shield_active = True
             self._sprite = self.shield_sprite 
-            self.collision_box = self.shield_collision_box
+            self._collision_box = self.shield_collision_box
             self.timestamp = now
-            self.curr_lives = self.lives
-            self.lives = 100000000
+            self.curr_lives = self._lives
+            self._lives = 100000000
             return
 
     def deactivate_shield(self):
@@ -174,9 +207,9 @@ class Character(Actor):
 
         self.shield_active = False
         self._sprite = self.normal_sprite
-        self.collision_box = self.normal_collision_box
+        self._collision_box = self.normal_collision_box
         self.timestamp = datetime.now()
-        self.lives = self.curr_lives
+        self._lives = self.curr_lives
         return
 
     def control(self, inp):
@@ -198,7 +231,7 @@ class Bullet(Pawn):
         super().__init__(self.art, position, obj_number, mass=mass,
                          drag_coeff=drag_coeff, pawn_type=9, max_velo=[0,3])
         self._velocity[1] = 3
-        self.is_solid = False
+        self._is_solid = False
 
 
 

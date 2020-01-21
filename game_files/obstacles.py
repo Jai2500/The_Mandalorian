@@ -27,11 +27,11 @@ class Firebeam(Pawn):
             return np.array(sprite)
 
     def on_collision(self, other):
-        if other.pawn_type == 8:  # Player
+        if other.get_pawn_type() == 8:  # Player
             other.die()
-            if other.lives > 0:
+            if other.get_lives() > 0:
                 self.die()
-        elif other.pawn_type == 9:
+        elif other.get_pawn_type() == 9:
             self.die()
             other.die()
         else:
@@ -50,12 +50,12 @@ class Magnet(Pawn):
         self.force_const = force_const
         # self.velocity[1] = 0.5
         self.drag_coeff = 0
-        self.is_solid = False
+        self._is_solid = False
 
     def on_trigger(self, pawn):
         # print("Entered here")
-        dist = np.linalg.norm(self.position - pawn.position)
-        diff = self.position - pawn.position
+        dist = np.linalg.norm(self._position - pawn.get_position())
+        diff = self._position - pawn.get_position()
         if pawn.shield_active is False:
             pawn_vel = pawn.get_velocity()
             y_vel = pawn_vel[0] + self.force_const *\
@@ -105,10 +105,10 @@ class Solid_Objects(Pawn):
 
     def on_collision(self, other):
 
-        if other.pawn_type == 8:
+        if other.get_pawn_type() == 8:
             if other.shield_active is True:
                 self.die()
-        elif other.pawn_type == 9:
+        elif other.get_pawn_type() == 9:
             other.die
             self.die()
         else:
@@ -157,20 +157,20 @@ class Boss_Enemy(Actor):
 
     def move(self, player, g_size):
         prob = 0.4
-        diff = self.position - player.position
+        diff = self._position - player.get_position()
         if np.random.random() < prob:
             if diff[0] > 0:
-                self.position[0] -= 1
+                self._position[0] -= 1
             else:
-                self.position[0] += 1
+                self._position[0] += 1
 
-            if self.position[0] < 1:
-                self.position[0] = 1
-            if self.position[0] + self._sprite.shape[0] >= g_size:
-                self.position[0] = g_size - self._sprite.shape[0]
+            if self._position[0] < 1:
+                self._position[0] = 1
+            if self._position[0] + self._sprite.shape[0] >= g_size:
+                self._position[0] = g_size - self._sprite.shape[0]
 
     def on_collision(self, other):
-        if other.pawn_type == 9:
+        if other.get_pawn_type() == 9:
             self.die()
             other.die()
         else:
@@ -178,7 +178,7 @@ class Boss_Enemy(Actor):
 
     def launch_bullet(self, obj_number):
         y = np.random.randint(0, self._sprite.shape[0])
-        return Boss_Bullet([self.position[0] + y, self.position[1] - 4], obj_number)
+        return Boss_Bullet([self._position[0] + y, self._position[1] - 4], obj_number)
 
 
 class Boss_Bullet(Pawn):
@@ -189,39 +189,39 @@ class Boss_Bullet(Pawn):
         super().__init__(self.art, position, obj_number, pawn_type=7, 
                          is_solid=False, lives=2)
         self._velocity[1] = - 2
-        self.is_solid = False
+        self._is_solid = False
 
     def move(self, player, g_size):
         prob = 0.1
-        diff = self.position - player.position
+        diff = self._position - player._position
         if np.random.random() < prob:
             if diff[0] > 0:
-                self.position[0] -= 1
+                self._position[0] -= 1
             else:
-                self.position[0] += 1
+                self._position[0] += 1
 
             if diff[1] > 0:
-                self.position[1] -= 1
+                self._position[1] -= 1
             else:
-                self.position[1] += 1
+                self._position[1] += 1
 
-            if self.position[0] < 1:
-                self.position[0] = 1
-            if self.position[0] + self._sprite.shape[0] >= g_size:
-                self.position[0] = g_size - self._sprite.shape[0]
+            if self._position[0] < 1:
+                self._position[0] = 1
+            if self._position[0] + self._sprite.shape[0] >= g_size:
+                self._position[0] = g_size - self._sprite.shape[0]
 
     def on_collision(self, other):
-        if other.pawn_type == 9:
+        if other.get_pawn_type() == 9:
             self.die()
-        elif other.pawn_type == 8:
+        elif other.get_pawn_type() == 8:
             if other.shield_active is False:
-                self.lives = 1
+                self._lives = 1
                 self.die()
                 other.die()
             else:
-                self.lives = 1
+                self._lives = 1
                 self.die()
         else:
-            self.lives = 1
+            self._lives = 1
             self.die()
             other.die()

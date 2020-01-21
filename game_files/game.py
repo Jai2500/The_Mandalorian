@@ -53,7 +53,7 @@ def generate_spawn_order():
 
 def delete_pawns(to_delete):
     for pawn_type in pawns:
-        pawns[pawn_type] = deque([obj for obj in pawns[pawn_type] if obj.obj_number
+        pawns[pawn_type] = deque([obj for obj in pawns[pawn_type] if obj.get_obj_number()
                             not in to_delete])
         # print(to_delete)
 
@@ -151,7 +151,7 @@ GROUND_SHAPE = np.array([['-' for i in range(SCREEN_DIM[1])]
 
 pawns[0].append(Pawn(GROUND_SHAPE, [SCREEN_DIM[0] - int(SCREEN_DIM[0] * 0.1), 0], 1))
 
-pawns[8].append(Character(TEST_SHAPE_2, [6, 12], 2, 1, pawn_type=8, lives=5))
+pawns[8].append(Character(TEST_SHAPE_2, [6, 12], 2, 1, pawn_type=8, lives=10))
 
 speed_boost_times = []
 
@@ -203,7 +203,7 @@ while(True):
         if inp == 'q':
             break
         elif inp == 'e':
-            pawns[9].append(Bullet([pawns[8][0].position[0], pawns[8][0].position[1] + 2], ObjNumber, 0))
+            pawns[9].append(Bullet([pawns[8][0].get_position()[0], pawns[8][0].get_position()[1] + 2], ObjNumber, 0))
             ObjNumber += 1
         else:
             pawns[8][0].control(inp)
