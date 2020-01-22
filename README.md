@@ -5,8 +5,8 @@
 In this work, I've created a terminal game which is very similar to Jetpack Joyride in concept. 
 
 ### Philosophy
-I could have easily gotten away by making the objects and the game engine to just suit this game, however, I decided to take the approach of building as general of a game engine which included a **shape agnostic physics engine** that not only registers 99.9% of all collisions but also follows the *Separating Axis Theorem (SAT)* to find out the *Minimum Push Vector* for each collision. <br>
-The physics engine also includes a parameterised **gravity**, **drag forces** and also **radial forces for the magnets**. A huge amount of detail was paid to even implement terminal velocity for the player objects. A complete acceleration and velocity is also implemented<br> 
+I could have easily gotten away by making the objects and the game engine to just suit this game, however, I decided to take the approach of building as general of a game engine as I could which included a **shape agnostic physics engine** that not only registers 99.9% of all collisions but also follows the *Separating Axis Theorem (SAT)* to find out the *Minimum Push Vector* for each collision. <br>
+The physics engine also includes a parameterised **gravity**, **drag forces** and **radial forces for the magnets**. A huge amount of detail was paid to even implement terminal velocity for the player objects. A complete acceleration and velocity physics is also implemented<br> 
 Moreover the object system was inspired from **Unreal Engine's Object Classification**. The classes were so defined to be as generalized as possible. <br>
 Some *shortcuts* were taken and the generalization was sacrificied so as to ensure that the program ran smoothly on the terminal screen.  
 
@@ -34,13 +34,13 @@ python3 game.py
 * **Ground**: The ground is present below the player at all times throughout the game.
 * **Solid Objects**: These are obstacles that are placed so as to slow down the player. It does not take away a life from the player. 
 * **Firebeams**: These are obstacles that have been modified from *solid objects* to cause the player to lose life on impact.
-* **Magnets**: These are obstacles that drag the player radially towards themselves. 
+* **Magnets**: These are obstacles that attract the player radially towards themselves. 
 * **Coin**: A collectible that will increase the score of the player.
 * **Speed Boost**: A collectible that will increase the game speed. 
 * **Shield**: The player will be able to activate his shield which will provide him invincibility.
 * **Player Bullets**: The player can shoot these which will destroy the obstacles (except the magnet) on impact. They also cause damage to the boss enemy.
 * **Boss Enemy**: The boss enemy spawns near the end of the game and fires player tracking bullets to the player. The boss enemy will follow the player along the Y axis.
-* **Player Dragon**: The player can spawn its own dragon which will cause the game to speed up and will provide shield after to the player.
+* **Player Dragon (Mr.Cuddles)**: The player can spawn its own dragon which will cause the game to speed up and will provide shield after to the player.
 
 ### Additional Details:
 * The game has a ```time``` system and the player has to complete the game within the time. 
