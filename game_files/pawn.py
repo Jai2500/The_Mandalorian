@@ -176,7 +176,7 @@ class Character(Actor):
             return
 
         now = datetime.now()
-        if (now - self.__timestamp).seconds > 5 or forced is True:
+        if (now - self.__timestamp).seconds > 8 or forced is True:
             self.__shield_active = True
             self._sprite = self.__shield_sprite 
             self._color_map = np.full(self._sprite.shape, '\u001b[44m')
