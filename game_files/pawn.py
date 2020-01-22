@@ -257,17 +257,17 @@ class Character(Actor):
                 ans = j
                 break
         ans += 1
-        head = np.array([['-', '-', ' ', ' '], ['-', '-', '-', '-'], ['-', '-', '-', ' '], ['O', 'O', ' ', ' '], [' ', 'O', 'O', ' '], [' ', 'O', 'O', 'O']]).reshape(6, 4)
+        head = np.array([['-', '-', ' ', ' '], ['-', '-', '-', '-'], ['-', '-', '-', ' ']]).reshape(3, 4)
         padding = np.array([' '] * 11).reshape(11, 1)
-        for i in range(6):
+        for i in range(3):
             s = np.array([' '] * 11).reshape(11, 1)
             padding = np.hstack((padding, s))
         output = np.hstack((output, padding))
-        padding = np.array([' '] * 67).reshape(1, 67)
+        padding = np.array([' '] * 64).reshape(1, 64)
         output = np.vstack((padding, output))
         output = np.vstack((padding, output))
         output = np.vstack((padding, output))
-        output[ans: ans + 6, -4:] = head
+        output[ans - 1: ans + 2, -4:] = head
 
         return output
 
@@ -282,7 +282,7 @@ class Character(Actor):
             return
 
         now = datetime.now()
-        if (now - self.__dragon_timestamp).seconds > 20:
+        if (now - self.__dragon_timestamp).seconds > 0:
             # print("Activating dragon")
             self._position = np.array([g_size - 12, 0])
             self.__dragon_active = True
