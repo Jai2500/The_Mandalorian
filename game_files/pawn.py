@@ -249,7 +249,7 @@ class Character(Actor):
             return
 
         now = datetime.now()
-        if (now - self.__dragon_timestamp).seconds > 0:
+        if (now - self.__dragon_timestamp).seconds > 20:
             self._position = np.array([g_size - 12, 0])
             self.__dragon_active = True
             self._sprite = self.create_sin_wave(offset)
