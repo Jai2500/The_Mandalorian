@@ -38,7 +38,7 @@ class Firebeam(Pawn):
             if other.get_dragon_active() is True:
                 self.die()
                 other.set_score(other.get_score() + 20)
-                return
+                other.deactivate_dragon()
             if other.get_shield_active() is True:
                 self.die()
                 other.set_score(other.get_score() + 20)
@@ -127,7 +127,10 @@ class Solid_Objects(Pawn):
     def on_collision(self, other):
 
         if other.get_pawn_type() == 8:
-            if other.get_shield_active() is True or other.get_dragon_active() is True:
+            if other.get_dragon_active() is True:
+                self.die()
+                other.deactivate_dragon()
+            if other.get_shield_active() is True:
                 self.die()
                 other.set_score(other.get_score() + 20)
         elif other.get_pawn_type() == 9:
@@ -247,7 +250,10 @@ class Boss_Bullet(Pawn):
             self.die()
             other.set_score(other.get_score() + 20)
         elif other.get_pawn_type() == 8:
-            if other.get_shield_active() is False and other.get_dragon_active() is False:
+            if other.get_dragon_active() is True:
+                self.die()
+                other.deactivate_dragon()
+            if other.get_shield_active() is False:
                 self._lives = 1
                 self.die()
                 other.set_score(other.get_score() + 20)

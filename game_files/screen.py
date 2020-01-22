@@ -26,18 +26,18 @@ class Screen:
         self.__screen_dim = \
             np.array(os.popen('stty size', 'r').read().split(), dtype='int')
         self.__screen_dim[0] -= 2
-        self.final_arr = np.array([[' ' for i in range(self.__screen_dim[1])]
+        self.__final_arr = np.array([[' ' for i in range(self.__screen_dim[1])]
                                    for j in range(self.__screen_dim[0])],
                                   dtype='<U100')
 
-        self.color_map = np.array([[BG_BLUE for i in range(self.__screen_dim[1])]
+        self.__color_map = np.array([[BG_BLUE for i in range(self.__screen_dim[1])]
                                    for j in range(self.__screen_dim[0])],
                                   dtype='<U100')
-        self.ground_height = self.__screen_dim[0] - \
+        self.__ground_height = self.__screen_dim[0] - \
             int(self.__screen_dim[0] * 0.10)
-        self.obj_arr = np.zeros((self.__screen_dim[0], self.__screen_dim[1]),
+        self.__obj_arr = np.zeros((self.__screen_dim[0], self.__screen_dim[1]),
                                 dtype=np.int32)
-        self.game_score = 0
+        self.__game_score = 0
 
     def get_dim(self):
         '''
@@ -46,18 +46,18 @@ class Screen:
         return self.__screen_dim
 
     def reset_screen(self):
-        self.final_arr = np.array([[' ' for i in range(self.__screen_dim[1])]
+        self.__final_arr = np.array([[' ' for i in range(self.__screen_dim[1])]
                                    for j in range(self.__screen_dim[0])],
                                   dtype='<U100')
-        self.color_map = np.array([[BG_BLUE for i in range(self.__screen_dim[1])]
+        self.__color_map = np.array([[BG_BLUE for i in range(self.__screen_dim[1])]
                             for j in range(self.__screen_dim[0])],
                             dtype='<U100')
         ground_color = np.array([[BG_GREEN for i in range(self.__screen_dim[1])]
-                                for j in range(self.ground_height, self.__screen_dim[0])],
+                                for j in range(self.__ground_height, self.__screen_dim[0])],
                                 dtype='<U100')
         # for i in range(self.__screen_dim[1]):
-        self.color_map[self.ground_height:, :] = ground_color
-        self.obj_arr = np.zeros((self.__screen_dim[0], self.__screen_dim[1]),
+        self.__color_map[self.__ground_height:, :] = ground_color
+        self.__obj_arr = np.zeros((self.__screen_dim[0], self.__screen_dim[1]),
                                 dtype=np.int32)
 
     def add_pawn(self, pawns, g_size):
@@ -84,7 +84,7 @@ class Screen:
                 pawns[i].set_to_delete(True)
 
             if pawns[i].get_to_delete() is False:
-                obj_array = self.obj_arr[
+                obj_array = self.__obj_arr[
                     pos_y: pos_y + pawns[i].get_sprite().shape[0],
                     max(0, pos_x): min(self.__screen_dim[1], pos_x + pawns[i].get_sprite().shape[1]),
                     ]
@@ -104,7 +104,7 @@ class Screen:
                                 if pawns[k].get_obj_number() == j:
                                     pawns[k].on_collision(pawns[i])
                                 if pawns[k].get_pawn_type() == 1:
-                                    self.game_score += 1
+                                    self.__game_score += 1
                     for j in objs:
                         if j != 0:
                             for k in range(len(pawns)):
@@ -131,15 +131,15 @@ class Screen:
                     elif pos_x + pawns[i].get_sprite().shape[1] >= self.__screen_dim[1]:
                         pos_x = self.__screen_dim[1] - pawns[i].get_sprite().shape[1]
 
-                self.obj_arr[pos_y: pos_y + pawns[i].get_sprite().shape[0],
+                self.__obj_arr[pos_y: pos_y + pawns[i].get_sprite().shape[0],
                              max(0, pos_x): min(self.__screen_dim[1], pos_x + pawns[i].get_sprite().shape[1])] \
                     = pawns[i].get_collision_box()[:, max(0, - pos_x): min(self.__screen_dim[1] - pos_x, pawns[i].get_sprite().shape[1])] * pawns[i].get_obj_number()
 
-                self.final_arr[pos_y: pos_y + pawns[i].get_sprite().shape[0],
+                self.__final_arr[pos_y: pos_y + pawns[i].get_sprite().shape[0],
                                max(0, pos_x): min(self.__screen_dim[1], pos_x + pawns[i].get_sprite().shape[1])
                                ] = pawns[i].get_sprite()[:, max(0, - pos_x): min(self.__screen_dim[1] - pos_x, pawns[i].get_sprite().shape[1])]
 
-                self.color_map[pos_y: pos_y + pawns[i].get_sprite().shape[0],
+                self.__color_map[pos_y: pos_y + pawns[i].get_sprite().shape[0],
                                max(0, pos_x): min(self.__screen_dim[1], pos_x + pawns[i].get_sprite().shape[1])
                                ] = pawns[i].get_color_map()[:, max(0, - pos_x): min(self.__screen_dim[1] - pos_x, pawns[i].get_sprite().shape[1])]
             else:
@@ -154,11 +154,11 @@ class Screen:
         print("Game Score: " + str(game_state[0]) + " Time Left: " + str(game_state[1]) + " Lives Left: " + str(game_state[2]) + "                          ")
         print(BG_BLUE, end='')
         ground_color = np.array([[BG_GREEN for i in range(self.__screen_dim[1])]
-                        for j in range(self.ground_height, self.__screen_dim[0])],
+                        for j in range(self.__ground_height, self.__screen_dim[0])],
                         dtype='<U100')
-        self.color_map[self.ground_height:, :] = ground_color
+        self.__color_map[self.__ground_height:, :] = ground_color
         # self.final_arr[self.ground_height][0] = BG_GREEN + \
         #     self.final_arr[self.ground_height][0]
-        self.final_arr = np.core.defchararray.add(self.color_map, self.final_arr)
-        final_img = ''.join(self.final_arr.ravel())
+        self.__final_arr = np.core.defchararray.add(self.__color_map, self.__final_arr)
+        final_img = ''.join(self.__final_arr.ravel())
         print(final_img)

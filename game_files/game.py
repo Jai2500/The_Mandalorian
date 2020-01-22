@@ -184,7 +184,7 @@ idx = 0
 
 while(True):
     time.sleep(0.033)
-    if distance_moved <= 1000:
+    if distance_moved <= 2500:
         spawn_pawns()
     else:
         spawn_boss()
@@ -210,7 +210,6 @@ while(True):
         if pawns[8][i].get_dragon_active() is True:
             if (now - pawns[8][i].get_dragon_timestamp()).seconds > 5:
                 pawns[8][i].deactivate_dragon()
-                pawns[8][i].activate_shield()
 
         if pawns[8][i].get_dragon_active() is True:
             pawns[8][i].set_dragon_sprite(offsets[idx])
@@ -228,7 +227,7 @@ while(True):
             pawns[9].append(Bullet([pawns[8][0].get_position()[0], pawns[8][0].get_position()[1] + 2], ObjNumber, 0))
             ObjNumber += 1
         else:
-            pawns[8][0].control(inp, offsets[i])
+            pawns[8][0].control(inp, offsets[i], GROUND_SIZE[0])
 
     for i in range(len(pawns[5])):
         pawns[8][0] = pawns[5][i].on_trigger(pawns[8][0])

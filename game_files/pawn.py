@@ -202,12 +202,12 @@ class Character(Actor):
     def set_score(self, score):
         self.__score = score
 
-    def activate_shield(self):
+    def activate_shield(self, forced=False):
         if self.__shield_active is True:
             return
 
         now = datetime.now()
-        if (now - self.__timestamp).seconds > 5:
+        if (now - self.__timestamp).seconds > 5 or forced is True:
             self.__shield_active = True
             self._sprite = self.__shield_sprite 
             self._color_map = np.full(self._sprite.shape, '\u001b[44m')
@@ -229,7 +229,7 @@ class Character(Actor):
         self._lives = self.__curr_lives
         return
 
-    def control(self, inp, offset):
+    def control(self, inp, offset, g_size):
         if inp == 'w':
             self._velocity[0] -= 2
         elif inp == 'a' and self.__dragon_active is False:
@@ -239,7 +239,7 @@ class Character(Actor):
         elif inp == ' ' and self.__dragon_active is False:
             self.activate_shield()
         elif inp == 'g' and self.__shield_active is False:
-            self.activate_dragon(offset)
+            self.activate_dragon(offset, g_size)
 
     def create_sin_wave(self, offset):
         period = np.linspace(-np.pi, np.pi, 60) + offset
@@ -277,14 +277,14 @@ class Character(Actor):
         self._color_map = np.full(self._sprite.shape, '\u001b[44m')
         self._collision_box = self.create_collision_box(self._sprite)
 
-    def activate_dragon(self, offset):
+    def activate_dragon(self, offset, g_size):
         if self.__dragon_active is True:
             return
 
         now = datetime.now()
         if (now - self.__dragon_timestamp).seconds > 20:
             # print("Activating dragon")
-            self._position = np.array([0, 0])
+            self._position = np.array([g_size - 12, 0])
             self.__dragon_active = True
             self._sprite = self.create_sin_wave(offset)
             self._color_map = np.full(self._sprite.shape, '\u001b[44m')
@@ -302,6 +302,7 @@ class Character(Actor):
         self._lives = self.__curr_lives
         self._collision_box = self.__normal_collision_box
         self.__dragon_active = False
+        self.activate_shield(True)
 
     def get_dragon_active(self):
         return self.__dragon_active
