@@ -55,7 +55,6 @@ class Screen:
         ground_color = np.array([[BG_GREEN for i in range(self.__screen_dim[1])]
                                 for j in range(self.__ground_height, self.__screen_dim[0])],
                                 dtype='<U100')
-        # for i in range(self.__screen_dim[1]):
         self.__color_map[self.__ground_height:, :] = ground_color
         self.__obj_arr = np.zeros((self.__screen_dim[0], self.__screen_dim[1]),
                                 dtype=np.int32)
@@ -89,8 +88,6 @@ class Screen:
                     max(0, pos_x): min(self.__screen_dim[1], pos_x + pawns[i].get_sprite().shape[1]),
                     ]
 
-                # PAWN_DICT[pawns[i].obj_number] = i
-                # print(pawns[i], pos_x, pos_y)
 
                 collision_box_size = [max(0, -pos_x), min(self.__screen_dim[1] - pos_x, pawns[i].get_sprite().shape[1])]
 
@@ -157,8 +154,6 @@ class Screen:
                         for j in range(self.__ground_height, self.__screen_dim[0])],
                         dtype='<U100')
         self.__color_map[self.__ground_height:, :] = ground_color
-        # self.final_arr[self.ground_height][0] = BG_GREEN + \
-        #     self.final_arr[self.ground_height][0]
         self.__final_arr = np.core.defchararray.add(self.__color_map, self.__final_arr)
         final_img = ''.join(self.__final_arr.ravel())
         print(final_img)

@@ -13,10 +13,8 @@ class Firebeam(Pawn):
         self.size = int(np.random.randint(3, 8))
         self.size = min(self.size, g_size - position[0])
         if self.type == 1:
-            # print("E1")
             return np.array(['*'] + ['-'] * (self.size - 2) + ['*']).reshape(1, self.size)
         elif self.type == 2:
-            # print("E2")
             return np.array(['*'] + ['|'] * (self.size - 2) + ['*']).reshape(
                 self.size, 1)
         else:
@@ -65,7 +63,6 @@ class Magnet(Pawn):
     def __init__(self, position, obj_number, lives=1, force_const=1.5):
         super().__init__(self.art, position, obj_number, lives=lives, pawn_type=5)
         self.force_const = force_const
-        # self.velocity[1] = 0.5
         self.drag_coeff = 0
         self._is_solid = False
 
@@ -73,26 +70,17 @@ class Magnet(Pawn):
         if pawn.get_dragon_active() is True:
             self.die()
             return pawn
-        # print("Entered here")
         dist = np.linalg.norm(self._position - pawn.get_position())
         diff = self._position - pawn.get_position()
         if pawn.get_shield_active() is False:
             pawn_vel = pawn.get_velocity()
             y_vel = pawn_vel[0] + self.force_const *\
                     np.round(diff[0]) / (dist**1.44 + 10) 
-            # pawn._velocity[0] += self.force_const *\
-            #         np.round(diff[0]) / (dist**1.44 + 10)
             x_vel = pawn_vel[1] + self.force_const *\
                 np.round(diff[1]) / (dist**1.44 + 10) 
-            # pawn.velocity[1] += self.force_const *\
-            #     np.round(diff[1]) / (dist**1.44 + 10)
             pawn.set_velocity(np.array([y_vel, x_vel]))
 
         return pawn
-
-# Maybe try to reduce the velocity of the player by a constant times norm
-# of the distance between them for each successive frame
-# 1/r effectively
 
 
 class Solid_Objects(Pawn):
@@ -107,13 +95,9 @@ class Solid_Objects(Pawn):
         self.size = int(np.random.randint(3, 8))
         self.size = min(self.size, g_size - position[0])
         if self.type == 1:
-            # print("E1")
             return np.array([['|'] + ['-'] + ['-'] * (self.size - 2) + ['-'] + ['|'],
                              ['|'] + ['-'] + ['-'] * (self.size - 2) + ['-'] + ['|']]).reshape(2, self.size + 2)
         elif self.type == 2:
-            # print("E2")
-            # return np.array(['|'] + ['|'] * (self.size - 2) + ['|']).reshape(
-            #     self.size, 1).T
             return np.array([['-'] + ['|'] + ['|'] * (self.size - 2) + ['|'] + ['-'],
                              ['-'] + ['|'] + ['|'] * (self.size - 2) + ['|'] + ['-']]).reshape(2, self.size + 2).T
         else:
@@ -168,7 +152,6 @@ class Boss_Enemy(Actor):
     def __init__(self, position, obj_number, lives):
         art = self.generate_sprite()
         super().__init__(art, position, obj_number, lives=lives)
-        # print(sprite.shape)
 
     def generate_sprite(self):
         m = 0

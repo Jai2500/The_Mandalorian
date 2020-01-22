@@ -1,6 +1,7 @@
 from pawn import Pawn
 import numpy as np
 
+
 class Coin(Pawn):
 
     art = np.array(['o']).reshape(1, 1)

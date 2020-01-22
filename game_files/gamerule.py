@@ -9,7 +9,6 @@ class Gamerule:
         self.__gravity = gravity
 
     def simulate_physics(self, pawn, speed_boost, g_size, screen_dim):
-        # print(pawn)
         pawn_vel = pawn.get_velocity()
         pawn_pos = pawn.get_position()
         pawn_vel[0] += pawn.get_mass() * self.__gravity
@@ -35,7 +34,7 @@ class Gamerule:
                 pawn_pos[1] = 0
             elif pawn_pos[1] + pawn.get_sprite().shape[1] >= screen_dim:
                 pawn_pos[1] = screen_dim - pawn.get_sprite().shape[1]
-        
+
         pawn.set_position(pawn_pos)
         return pawn
 

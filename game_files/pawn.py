@@ -93,7 +93,6 @@ class Pawn:
 class Actor(Pawn):
 
     def check_collision(self, out_arr, collision_box_size):
-        # print(out_arr.shape)
         overlap_box = self._collision_box[:, collision_box_size[0]:collision_box_size[1]] * out_arr
 
         # Version 1.2 based on the Z-index
@@ -124,29 +123,6 @@ class Actor(Pawn):
                 if non_zero.size > 0:
                     mpv[1] = self._sprite.shape[1] - np.min(non_zero)
 
-        # if np.sum(overlap_box) > 0:
-        #     mpv = np.array([0, 0])
-        #     row_sums = np.sum(overlap_box, axis=1)
-        #     non_zero = np.nonzero(row_sums)[0]
-        #     if non_zero.size > 0:
-        #         met_a = self.sprite.shape[0] - np.min(non_zero)
-        #         met_b = np.max(non_zero)
-        #         if met_a < met_b:
-        #             mpv[0] = - met_a
-        #         else:
-        #             mpv[0] =  met_b
-
-        #     col_sums = np.sum(overlap_box, axis=0)
-        #     non_zero = np.nonzero(col_sums)[0]
-        #     if non_zero.size > 0:
-        #         met_a = self.sprite.shape[1] - np.min(non_zero)
-        #         met_b = np.max(non_zero)
-        #         if met_a < met_b:
-        #             mpv[1] = met_a
-        #         else:
-        #             mpv[1] = - met_b
-
-            # print(mpv, "MPV")
             if abs(mpv[0]) < abs(mpv[1]):
                 mpv[1] = 0
             elif abs(mpv[1]) < abs(mpv[0]):
@@ -154,13 +130,6 @@ class Actor(Pawn):
             elif mpv[0] == 10000 and mpv[1] == 10000:
                 mpv[0] = 0
                 mpv[1] = 0
-            # print(mpv) 
-
-        # if np.sum(overlap_box) > 0:
-        #     mpv = np.array([0,0])
-        #     if self.velocity[0] != 0:
-        #         row_sums = np.sum(overlap_box, axis = 1)
-        #         non_zero = np.nonzero(row_sums)[0]
 
             new_position = self._position + mpv
             new_velocity = self._velocity - (mpv != 0) * self._velocity
@@ -214,7 +183,6 @@ class Character(Actor):
             self._collision_box = self.__shield_collision_box
             self.__timestamp = now
             self.__curr_lives = self._lives
-            # self._lives = 100000000
             return
 
     def deactivate_shield(self):
@@ -272,7 +240,6 @@ class Character(Actor):
         return output
 
     def set_dragon_sprite(self, offset):
-        # print("Entered here")
         self._sprite = self.create_sin_wave(offset)
         self._color_map = np.full(self._sprite.shape, '\u001b[44m')
         self._collision_box = self.create_collision_box(self._sprite)
@@ -283,7 +250,6 @@ class Character(Actor):
 
         now = datetime.now()
         if (now - self.__dragon_timestamp).seconds > 0:
-            # print("Activating dragon")
             self._position = np.array([g_size - 12, 0])
             self.__dragon_active = True
             self._sprite = self.create_sin_wave(offset)
@@ -328,14 +294,3 @@ class Bullet(Pawn):
 
     def set_score(self, score):
         self.__score = score
-
-
-
-
-
-# Refactor code -->
-# Pawn is all the things that exist on the board
-# Actor similar to things that can move and can stop on collision
-# Maybe add a player class after this
-# Each of the obstacles will be individual classes
-# Do I need to revamp the system of force? 

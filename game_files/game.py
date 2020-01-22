@@ -61,7 +61,6 @@ def delete_pawns(to_delete):
     for pawn_type in pawns:
         pawns[pawn_type] = deque([obj for obj in pawns[pawn_type] if obj.get_obj_number()
                             not in to_delete])
-        # print(to_delete)
 
 
 def spawn_coins(y):
@@ -71,17 +70,16 @@ def spawn_coins(y):
     global ObjNumber
     for i in range(size[0]):
         for j in range(size[1]):
-            # print(j)
             coin_list.append(GAMERULE.set_spawn_velo(Coin([y + i, SCREEN_DIM[1] + j], ObjNumber)))
             ObjNumber += 1
-    # for i in coin_list:
-    #     print(i.position)
     pawns[1] += coin_list
 
 
 def spawn_pawns():
     global ObjNumber
+
     # improve the spawning by position of player
+    
     # Setting the probabilities of spawning
     prob_coins = 0.02
     prob_speed_boost = 0.01 
@@ -96,7 +94,6 @@ def spawn_pawns():
         spawn_coins(y)
 
     # Spawning speed_boost
-    # for i in range(np.random.randint(1, 2)):
     prob = np.random.random()
     if prob < prob_speed_boost + 1e-6:
         y = np.random.randint(0, GROUND_SIZE[0] - 2)
@@ -108,7 +105,6 @@ def spawn_pawns():
     # Spawning Solid Objects
     prob = np.random.random()
     if prob < prob_solid_objects + 1e-6:
-        # for i in range(np.random.randint(1, 2)):
         y = np.random.randint(0, GROUND_SIZE[0] - 3)
         pawns[3].append(GAMERULE.set_spawn_velo(Solid_Objects([y,
                         SCREEN_DIM[1] + 1], ObjNumber, GROUND_SIZE[0])))
@@ -117,7 +113,6 @@ def spawn_pawns():
     # Spawning Firebeams
     prob = np.random.random()
     if prob < prob_firebeams + 1e-6:
-        # for i in range(np.random.randint(1, 3)):
         y = np.random.randint(0, GROUND_SIZE[0] - 3)
         pawns[4].append(GAMERULE.set_spawn_velo(Firebeam([y, SCREEN_DIM[1]
                                                              + 1], ObjNumber, 
@@ -125,7 +120,6 @@ def spawn_pawns():
         ObjNumber += 1
 
     # Spawning Magnet
-    # for i in range(np.random.randint(1, 2)):
     prob = np.random.random()
     if prob < prob_magnets + 1e-6:
         y = np.random.randint(0, GROUND_SIZE[0] - 2)
@@ -272,7 +266,6 @@ while(True):
         break
 
     TERM_SCREEN.draw([game_score, 150 - (now - init_time).seconds, pawns[8][0].get_lives()])
-    # print(distance_moved)
     distance_moved += (std_velocity_frame + speed_boost)
     idx += 1
     idx %= 60
