@@ -157,7 +157,7 @@ GROUND_SHAPE = np.array([['-' for i in range(SCREEN_DIM[1])]
 
 pawns[0].append(Pawn(GROUND_SHAPE, [SCREEN_DIM[0] - int(SCREEN_DIM[0] * 0.1), 0], 1))
 
-pawns[8].append(Character(TEST_SHAPE_2, [6, 12], 2, 1, pawn_type=8, lives=5))
+pawns[8].append(Character(TEST_SHAPE_2, [6, 12], 2, 1, pawn_type=8, lives=8))
 
 speed_boost_times = []
 

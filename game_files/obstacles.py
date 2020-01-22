@@ -6,6 +6,7 @@ class Firebeam(Pawn):
     def __init__(self, position, obj_number, g_size, lives=1):
         art = self.create_sprite(g_size, position)
         super().__init__(art, position, obj_number, mass=0, pawn_type=4, lives=lives)
+        self.generate_color_map()
 
     def create_sprite(self, g_size, position):
         self.type = np.random.randint(1, 4)
@@ -25,6 +26,12 @@ class Firebeam(Pawn):
                     [' '] * i + ['*'] + [' '] * (self.size - i - 1)
                 )
             return np.array(sprite)
+
+    def generate_color_map(self):
+        for i in range(self._sprite.shape[0]):
+            for j in range(self._sprite.shape[1]):
+                if self._sprite[i, j] in ['*', '-', '|']:
+                    self._color_map[i, j] = '\u001b[41m'
 
     def on_collision(self, other):
         if other.get_pawn_type() == 8:  # Player
@@ -93,6 +100,7 @@ class Solid_Objects(Pawn):
     def __init__(self, position, obj_number, g_size, lives=1):
         art = self.create_sprite(g_size, position)
         super().__init__(art, position, obj_number, mass=0, pawn_type=3, lives=lives)
+        self.generate_color_map()
 
     def create_sprite(self, g_size, position):
         self.type = np.random.randint(1, 4)
@@ -131,6 +139,12 @@ class Solid_Objects(Pawn):
                 self.die()
             else:
                 other.die()
+
+    def generate_color_map(self):
+        for i in range(self._sprite.shape[0]):
+            for j in range(self._sprite.shape[1]):
+                if self._sprite[i, j] in ['-', '|']:
+                    self._color_map[i, j] = '\u001b[46m'
 
 
 class Boss_Enemy(Actor):
@@ -201,11 +215,13 @@ class Boss_Bullet(Pawn):
     art = np.array([['<', '-', '-', '|'],
                        ['<', '-', '-', '|']])
 
+
     def __init__(self, position, obj_number):
         super().__init__(self.art, position, obj_number, pawn_type=7, 
                          is_solid=False, lives=2)
         self._velocity[1] = - 2
         self._is_solid = False
+        self._color_map = np.full(self._sprite.shape, '\u001b[40m')
 
     def move(self, player, g_size):
         prob = 0.1

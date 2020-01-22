@@ -17,6 +17,7 @@ class Pawn:
         self._drag_coeff = drag_coeff
         self._is_solid = is_solid
         self._max_velo = max_velo
+        self._color_map = np.full(self._sprite.shape, '\u001b[44m')
 
     def get_mass(self):
         return self._mass
@@ -62,6 +63,9 @@ class Pawn:
 
     def set_to_delete(self, to_delete):
         self._to_delete = to_delete
+
+    def get_color_map(self):
+        return self._color_map
 
     def create_collision_box(self, obj_shape):
         collision_box = obj_shape != ' '
@@ -206,6 +210,7 @@ class Character(Actor):
         if (now - self.__timestamp).seconds > 5:
             self.__shield_active = True
             self._sprite = self.__shield_sprite 
+            self._color_map = np.full(self._sprite.shape, '\u001b[44m')
             self._collision_box = self.__shield_collision_box
             self.__timestamp = now
             self.__curr_lives = self._lives
@@ -218,6 +223,7 @@ class Character(Actor):
 
         self.__shield_active = False
         self._sprite = self.__normal_sprite
+        self._color_map = np.full(self._sprite.shape, '\u001b[44m')
         self._collision_box = self.__normal_collision_box
         self.__timestamp = datetime.now()
         self._lives = self.__curr_lives
@@ -268,6 +274,7 @@ class Character(Actor):
     def set_dragon_sprite(self, offset):
         # print("Entered here")
         self._sprite = self.create_sin_wave(offset)
+        self._color_map = np.full(self._sprite.shape, '\u001b[44m')
         self._collision_box = self.create_collision_box(self._sprite)
 
     def activate_dragon(self, offset):
@@ -280,6 +287,7 @@ class Character(Actor):
             self._position = np.array([0, 0])
             self.__dragon_active = True
             self._sprite = self.create_sin_wave(offset)
+            self._color_map = np.full(self._sprite.shape, '\u001b[44m')
             self._collision_box = self.create_collision_box(self._sprite)
             self.__dragon_timestamp = now
             self.__curr_lives = self._lives
@@ -289,6 +297,7 @@ class Character(Actor):
             return
 
         self._sprite = self.__normal_sprite
+        self._color_map = np.full(self._sprite.shape, '\u001b[44m')
         self.__dragon_timestamp = datetime.now()
         self._lives = self.__curr_lives
         self._collision_box = self.__normal_collision_box
@@ -300,6 +309,7 @@ class Character(Actor):
     def get_dragon_timestamp(self):
         return self.__dragon_timestamp
 
+
 class Bullet(Pawn):
 
     art = np.array(['>', '-', '-', '-', '-', '>']).reshape(1, 6)
@@ -310,6 +320,7 @@ class Bullet(Pawn):
         self._velocity[1] = 3
         self._is_solid = False
         self.__score = 0
+        self._color_map = np.full(self._sprite.shape, '\u001b[45m')
 
     def get_score(self):
         return self.__score
