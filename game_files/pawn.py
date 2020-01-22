@@ -183,6 +183,8 @@ class Character(Actor):
             self.__shield_sprite = shield_sprite
         self.__shield_collision_box = self.create_collision_box(self.__shield_sprite)
         self.__score = 0
+        self.__dragon_active = False
+        self.__dragon_timestamp = datetime.now()
 
     def get_shield_active(self):
         return self.__shield_active
@@ -207,7 +209,7 @@ class Character(Actor):
             self._collision_box = self.__shield_collision_box
             self.__timestamp = now
             self.__curr_lives = self._lives
-            self._lives = 100000000
+            # self._lives = 100000000
             return
 
     def deactivate_shield(self):
@@ -221,16 +223,82 @@ class Character(Actor):
         self._lives = self.__curr_lives
         return
 
-    def control(self, inp):
+    def control(self, inp, offset):
         if inp == 'w':
             self._velocity[0] -= 2
-        elif inp == 'a':
+        elif inp == 'a' and self.__dragon_active is False:
             self._velocity[1] -= 1
-        elif inp == 'd':
+        elif inp == 'd' and self.__dragon_active is False:
             self._velocity[1] += 1
-        elif inp == ' ':
+        elif inp == ' ' and self.__dragon_active is False:
             self.activate_shield()
+        elif inp == 'g' and self.__shield_active is False:
+            self.activate_dragon(offset)
 
+    def create_sin_wave(self, offset):
+        period = np.linspace(-np.pi, np.pi, 60) + offset
+        s = np.sin(period)
+        base = (np.round(s * 5) + 6).astype(int)
+        output = np.array([' '] * 11).reshape(11, 1)
+        for j in base:
+            e = np.array([' '] * (11 - j) + ['*'] + [' '] * (j-1)).reshape(11, 1)
+            output = np.hstack((output, e))
+        output = output[:, 1:]
+
+        ans = 0
+        for j in range(len(output[:, -1])):
+            if output[j, -1] == '*':
+                ans = j
+                break
+        ans += 1
+        head = np.array([['-', '-', ' ', ' '], ['-', '-', '-', '-'], ['-', '-', '-', ' '] ]).reshape(3, 4)
+        padding = np.array([' '] * 11).reshape(11, 1)
+        for i in range(3):
+            s = np.array([' '] * 11).reshape(11,1)
+            padding = np.hstack((padding, s))
+        output = np.hstack((output, padding))
+        padding = np.array([' '] * 64).reshape(1,64)
+        output = np.vstack((padding, output))
+        output = np.vstack((padding, output))
+        output = np.vstack((padding, output))
+        output[ans: ans + 3, -4:] = head
+
+        return output
+
+    def set_dragon_sprite(self, offset):
+        # print("Entered here")
+        self._sprite = self.create_sin_wave(offset)
+        self._collision_box = self.create_collision_box(self._sprite)
+
+    def activate_dragon(self, offset):
+        if self.__dragon_active is True:
+            return
+
+        now = datetime.now()
+        if (now - self.__dragon_timestamp).seconds > 20:
+            # print("Activating dragon")
+            self._position = np.array([0, 0])
+            self.__dragon_active = True
+            self._sprite = self.create_sin_wave(offset)
+            self._collision_box = self.create_collision_box(self._sprite)
+            self.__dragon_timestamp = now
+            self.__curr_lives = self._lives
+
+    def deactivate_dragon(self):
+        if self.__dragon_active is False:
+            return
+
+        self._sprite = self.__normal_sprite
+        self.__dragon_timestamp = datetime.now()
+        self._lives = self.__curr_lives
+        self._collision_box = self.__normal_collision_box
+        self.__dragon_active = False
+
+    def get_dragon_active(self):
+        return self.__dragon_active
+
+    def get_dragon_timestamp(self):
+        return self.__dragon_timestamp
 
 class Bullet(Pawn):
 
@@ -241,6 +309,13 @@ class Bullet(Pawn):
                          drag_coeff=drag_coeff, pawn_type=9, max_velo=[0,3])
         self._velocity[1] = 3
         self._is_solid = False
+        self.__score = 0
+
+    def get_score(self):
+        return self.__score
+
+    def set_score(self, score):
+        self.__score = score
 
 
 

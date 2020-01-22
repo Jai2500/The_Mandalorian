@@ -25,6 +25,7 @@ class Screen:
         '''
         self.__screen_dim = \
             np.array(os.popen('stty size', 'r').read().split(), dtype='int')
+        self.__screen_dim[0] -= 2
         self.final_arr = np.array([[' ' for i in range(self.__screen_dim[1])]
                                    for j in range(self.__screen_dim[0])],
                                   dtype='<U100')
@@ -131,11 +132,13 @@ class Screen:
                 to_delete.append(pawns[i].get_obj_number())
         return to_delete
 
-    def draw(self):
+    def draw(self, game_state):
         '''
             Draw the final image onto the screen
         '''
-        print('\033[0;0H' + BG_BLUE, end='')
+        print('\033[0;0H' + cl.Back.LIGHTBLACK_EX, end='')
+        print("Game Score: " + str(game_state[0]) + " Time Left: " + str(game_state[1]) + " Lives Left: " + str(game_state[2]) + "                          ")
+        print(BG_BLUE, end='')
         self.final_arr[self.ground_height][0] = BG_GREEN + \
             self.final_arr[self.ground_height][0]
         final_img = ''.join(self.final_arr.ravel())

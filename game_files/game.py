@@ -29,6 +29,11 @@ GAMERULE = Gamerule(0.3)
 
 speed_boost = 0
 
+game_score = 0
+
+object_score = 0
+
+
 pawns = {
     0: deque([]),  # Ground + Roof
     1: deque([]),  # Coins
@@ -52,6 +57,7 @@ def generate_spawn_order():
 
 
 def delete_pawns(to_delete):
+    global object_score
     for pawn_type in pawns:
         pawns[pawn_type] = deque([obj for obj in pawns[pawn_type] if obj.get_obj_number()
                             not in to_delete])
@@ -77,11 +83,11 @@ def spawn_pawns():
     global ObjNumber
     # improve the spawning by position of player
     # Setting the probabilities of spawning
-    prob_coins = 0.02 
+    prob_coins = 0.02
     prob_speed_boost = 0.01 
     prob_solid_objects = 0.05 
     prob_firebeams = 0.07 
-    prob_magnets = 0.01
+    prob_magnets = 0.007
 
     # Spawning Coins
     prob = np.random.random()
@@ -151,7 +157,7 @@ GROUND_SHAPE = np.array([['-' for i in range(SCREEN_DIM[1])]
 
 pawns[0].append(Pawn(GROUND_SHAPE, [SCREEN_DIM[0] - int(SCREEN_DIM[0] * 0.1), 0], 1))
 
-pawns[8].append(Character(TEST_SHAPE_2, [6, 12], 2, 1, pawn_type=8, lives=10))
+pawns[8].append(Character(TEST_SHAPE_2, [6, 12], 2, 1, pawn_type=8, lives=5))
 
 speed_boost_times = []
 
@@ -173,9 +179,12 @@ win = False
 print('\033[2J')
 print('\x1B[?25l')
 
+offsets = np.linspace(-np.pi, np.pi, 60)
+idx = 0
+
 while(True):
     time.sleep(0.033)
-    if distance_moved <= 200:
+    if distance_moved <= 1000:
         spawn_pawns()
     else:
         spawn_boss()
@@ -198,27 +207,40 @@ while(True):
             if (now - pawns[8][i].get_timestamp()).seconds > 5:
                 pawns[8][i].deactivate_shield()
 
+        if pawns[8][i].get_dragon_active() is True:
+            if (now - pawns[8][i].get_dragon_timestamp()).seconds > 5:
+                pawns[8][i].deactivate_dragon()
+                pawns[8][i].activate_shield()
+
+        if pawns[8][i].get_dragon_active() is True:
+            pawns[8][i].set_dragon_sprite(offsets[idx])
+            speed_boost += 0.005
+            speed_boost_times.append(now)
+            pawns[8][i].set_position(np.array([GROUND_SIZE[0] - 12, 0]))
+
+
+
     if _KBHIT.kbhit():
         inp = _KBHIT.getch().lower()
         if inp == 'q':
             break
-        elif inp == 'e':
+        elif inp == 'e' and pawns[8][0].get_dragon_active() is False:
             pawns[9].append(Bullet([pawns[8][0].get_position()[0], pawns[8][0].get_position()[1] + 2], ObjNumber, 0))
             ObjNumber += 1
         else:
-            pawns[8][0].control(inp)
+            pawns[8][0].control(inp, offsets[i])
 
     for i in range(len(pawns[5])):
         pawns[8][0] = pawns[5][i].on_trigger(pawns[8][0])
 
     old_size = len(speed_boost_times)
-    speed_boost_times = [time for time in speed_boost_times if (now - time).seconds < 10]
+    speed_boost_times = [time for time in speed_boost_times if (now - time).seconds < 8]
     decrease = old_size - len(speed_boost_times)
-    speed_boost -= decrease * 0.01
+    speed_boost -= decrease * 0.005
 
     for i in range(len(pawns[2])):
         if pawns[2][i].is_activated is True:
-            speed_boost += 0.01
+            speed_boost += 0.005
             speed_boost_times.append(now)
 
     for i in range(len(pawns[6])):
@@ -242,16 +264,28 @@ while(True):
 
     to_delete += TERM_SCREEN.add_pawn(spawn_order, GROUND_SIZE[0])
 
+    for i in pawns[9]:
+        object_score += i.get_score()
+
     delete_pawns(to_delete)
 
-    TERM_SCREEN.draw()
+    if len(pawns[8]) == 0:
+        break
+
+    TERM_SCREEN.draw([game_score, 150 - (now - init_time).seconds, pawns[8][0].get_lives()])
     # print(distance_moved)
     distance_moved += (std_velocity_frame + speed_boost)
+    idx += 1
+    idx %= 60
+    game_score = pawns[8][0].get_score() + int(np.round(distance_moved)) + object_score
 
 os.system('clear')
 print('\033[2H', cl.Style.RESET_ALL)
 
-win_string = cl.Back.BLACK + '''
+screen_black = [' '] * (SCREEN_DIM[0] * SCREEN_DIM[1])
+print(''.join(screen_black)) 
+
+win_string = '''
 _/      _/    _/_/    _/    _/      _/          _/    _/_/    _/      _/   
  _/  _/    _/    _/  _/    _/      _/          _/  _/    _/  _/_/    _/    
   _/      _/    _/  _/    _/      _/    _/    _/  _/    _/  _/  _/  _/     
@@ -259,13 +293,15 @@ _/      _/    _/_/    _/    _/      _/          _/    _/_/    _/      _/
 _/        _/_/      _/_/            _/  _/        _/_/    _/      _/  
 '''
 
-lose_string = cl.Back.BLACK + '''
+lose_string = '''
 _/      _/    _/_/    _/    _/      _/          _/_/      _/_/_/  _/_/_/_/_/   
  _/  _/    _/    _/  _/    _/      _/        _/    _/  _/            _/        
   _/      _/    _/  _/    _/      _/        _/    _/    _/_/        _/         
  _/      _/    _/  _/    _/      _/        _/    _/        _/      _/          
 _/        _/_/      _/_/        _/_/_/_/    _/_/    _/_/_/        _/   
 '''
+
+print('\033[2H')
 
 if win is True:
     print(win_string)

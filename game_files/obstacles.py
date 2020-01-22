@@ -28,12 +28,22 @@ class Firebeam(Pawn):
 
     def on_collision(self, other):
         if other.get_pawn_type() == 8:  # Player
+            if other.get_dragon_active() is True:
+                self.die()
+                other.set_score(other.get_score() + 20)
+                return
+            if other.get_shield_active() is True:
+                self.die()
+                other.set_score(other.get_score() + 20)
+                return
             other.die()
             if other.get_lives() > 0:
                 self.die()
+                other.set_score(other.get_score() + 20)
         elif other.get_pawn_type() == 9:
             self.die()
             other.die()
+            other.set_score(other.get_score() + 20)
         else:
             if np.random.random() < 0.5:
                 self.die()
@@ -53,6 +63,9 @@ class Magnet(Pawn):
         self._is_solid = False
 
     def on_trigger(self, pawn):
+        if pawn.get_dragon_active() is True:
+            self.die()
+            return pawn
         # print("Entered here")
         dist = np.linalg.norm(self._position - pawn.get_position())
         diff = self._position - pawn.get_position()
@@ -106,11 +119,13 @@ class Solid_Objects(Pawn):
     def on_collision(self, other):
 
         if other.get_pawn_type() == 8:
-            if other.get_shield_active() is True:
+            if other.get_shield_active() is True or other.get_dragon_active() is True:
                 self.die()
+                other.set_score(other.get_score() + 20)
         elif other.get_pawn_type() == 9:
             other.die
             self.die()
+            other.set_score(other.get_score() + 20)
         else:
             if np.random.random() < 0.5:
                 self.die()
@@ -173,6 +188,7 @@ class Boss_Enemy(Actor):
         if other.get_pawn_type() == 9:
             self.die()
             other.die()
+            other.set_score(other.get_score() + 20)
         else:
             other.die()
 
@@ -213,10 +229,12 @@ class Boss_Bullet(Pawn):
     def on_collision(self, other):
         if other.get_pawn_type() == 9:
             self.die()
+            other.set_score(other.get_score() + 20)
         elif other.get_pawn_type() == 8:
-            if other.get_shield_active() is False:
+            if other.get_shield_active() is False and other.get_dragon_active() is False:
                 self._lives = 1
                 self.die()
+                other.set_score(other.get_score() + 20)
                 other.die()
             else:
                 self._lives = 1
