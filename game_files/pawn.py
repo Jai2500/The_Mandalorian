@@ -178,7 +178,7 @@ class Character(Actor):
         now = datetime.now()
         if (now - self.__timestamp).seconds > 8 or forced is True:
             self.__shield_active = True
-            self._sprite = self.__shield_sprite 
+            self._sprite = self.__shield_sprite
             self._color_map = np.full(self._sprite.shape, '\u001b[44m')
             self._collision_box = self.__shield_collision_box
             self.__timestamp = now
@@ -225,17 +225,17 @@ class Character(Actor):
                 ans = j
                 break
         ans += 1
-        head = np.array([['-', '-', ' ', ' '], ['-', '-', '-', '-'], ['-', '-', '-', ' ']]).reshape(3, 4)
+        head = np.array([['-', '-', ' ', ' ', ' ', '/', '/'], ['-', '-', '-', '-', ' ', 'O', '-'], ['-', '-', '-', ' ', ' ', '\\', '\\']]).reshape(3, 7)
         padding = np.array([' '] * 11).reshape(11, 1)
-        for i in range(3):
+        for i in range(7):
             s = np.array([' '] * 11).reshape(11, 1)
             padding = np.hstack((padding, s))
         output = np.hstack((output, padding))
-        padding = np.array([' '] * 64).reshape(1, 64)
+        padding = np.array([' '] * 68).reshape(1, 68)
         output = np.vstack((padding, output))
         output = np.vstack((padding, output))
         output = np.vstack((padding, output))
-        output[ans - 1: ans + 2, -4:] = head
+        output[ans - 1: ans + 2, -7:] = head
 
         return output
 
