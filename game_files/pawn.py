@@ -257,17 +257,17 @@ class Character(Actor):
                 ans = j
                 break
         ans += 1
-        head = np.array([['-', '-', ' ', ' '], ['-', '-', '-', '-'], ['-', '-', '-', ' '] ]).reshape(3, 4)
+        head = np.array([['-', '-', ' ', ' '], ['-', '-', '-', '-'], ['-', '-', '-', ' '], ['O', 'O', ' ', ' '], [' ', 'O', 'O', ' '], [' ', 'O', 'O', 'O']]).reshape(6, 4)
         padding = np.array([' '] * 11).reshape(11, 1)
-        for i in range(3):
-            s = np.array([' '] * 11).reshape(11,1)
+        for i in range(6):
+            s = np.array([' '] * 11).reshape(11, 1)
             padding = np.hstack((padding, s))
         output = np.hstack((output, padding))
-        padding = np.array([' '] * 64).reshape(1,64)
+        padding = np.array([' '] * 67).reshape(1, 67)
         output = np.vstack((padding, output))
         output = np.vstack((padding, output))
         output = np.vstack((padding, output))
-        output[ans: ans + 3, -4:] = head
+        output[ans: ans + 6, -4:] = head
 
         return output
 
