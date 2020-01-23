@@ -299,5 +299,3 @@ if win is True:
     print(win_string)
 else:
     print(lose_string)
-
-print("Your Score was: " + str(game_score))

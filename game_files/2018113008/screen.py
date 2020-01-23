@@ -39,13 +39,6 @@ class Screen:
                                 dtype=np.int32)
         self.__game_score = 0
 
-        self.__add_back = 0
-
-        self.__num_map = [(y, x) for y in range(self.__screen_dim[0] - 20) for x in range(self.__screen_dim[1])]
-
-        self.__random_color = np.random.choice(len(self.__num_map), 10)
-
-
     def get_dim(self):
         '''
             Returns the height and width of the screen. Used as a wrapper
@@ -65,10 +58,6 @@ class Screen:
         self.__color_map[self.__ground_height:, :] = ground_color
         self.__obj_arr = np.zeros((self.__screen_dim[0], self.__screen_dim[1]),
                                 dtype=np.int32)
-
-        for idx in self.__random_color:
-                self.__color_map[self.__num_map[idx][0], self.__num_map[idx][1]] = cl.Back.WHITE
-
 
     def add_pawn(self, pawns, g_size):
         to_delete = []
@@ -158,11 +147,6 @@ class Screen:
         '''
             Draw the final image onto the screen
         '''
-        if self.__add_back % 100 == 0:
-            self.__random_color = np.random.choice(len(self.__num_map), 10)
-            for idx in self.__random_color:
-                self.__color_map[self.__num_map[idx][0], self.__num_map[idx][1]] = cl.Back.WHITE
-        self.__add_back += 1
         print('\033[0;0H' + cl.Back.LIGHTBLACK_EX, end='')
         print("Game Score: " + str(game_state[0]) + " Time Left: " + str(game_state[1]) + " Lives Left: " + str(game_state[2]) + "                          ")
         print(BG_BLUE, end='')

@@ -51,4 +51,3 @@ python3 game.py
 ### Way forward:
 1. Currently the terminal game only works for ```Linux Terminals```. Can work on to port it to the ```Windows Powershell```. 
 2. Implement a procedurally random generation algorithm instead of a simple random generation system. 
-3. Improve aesthetics of the game. 
